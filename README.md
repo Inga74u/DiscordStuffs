@@ -14,4 +14,4 @@ Kazuki is being developed by [Inga74u](https://github.com/inga74u), currently it
 
 
 ## Shalltear
-Shalltear is being developed by [mushi88 (Kirisi)](https://github.com/mushi88).
+Shalltear is being developed by [mushi88 (Kirsi)](https://github.com/mushi88).
