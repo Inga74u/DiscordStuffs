@@ -9,7 +9,7 @@ A repository for a bunch of Discord bots in my server.
 
 
 ## Kazuki
-Kazuki is being developed by Inga74u, currently it is a part of my own Java program 'Thanatos' and has to be detached from it to be uploaded everytime.
+Kazuki is being developed by Inga74u, currently it is a part of his own Java program 'Thanatos' and has to be detached from said program to be uploaded everytime.
 
 
 
