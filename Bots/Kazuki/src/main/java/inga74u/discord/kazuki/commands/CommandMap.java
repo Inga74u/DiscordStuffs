@@ -40,7 +40,7 @@ public class CommandMap {
                 idle = new Idle(manager);
                 new Thread(idle).start();
                 break;
-            defult:
+            default:
                 System.out.println("Idle must be either 0 or 1");
                 break;
         }
