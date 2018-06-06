@@ -1,25 +1,29 @@
 import asyncio
 import discord
 
+from Bot import Permissions
+
 Commands = {}
 Token = None
 Prefix = ""
 
 class _createCommand:
-    def __init__(self, Call, Description, Function, Perms):
+    def __init__(self, Call, Description, Function, Perms, PermMod):
         self.Call = Call
         self.Description = Description
         self.Function = Function
         self.Perms = Perms
+        
+        self.PermMod = PermMod
     
     async def Do(self, Bot, Msg, Args):
         if self.PermCheck(Msg):
             await self.Function(Bot, Msg, Args)
     
     def PermCheck(self, Msg):
-        Perms = Msg.author.server_permissions
+        Perms = self.PermsList(Msg.author.server_permissions)
         
-        if self.Perms == None or Perms.administrator or Perms >= self.Perms:
+        if self.Perms == self.PermMod.Default or self.Perms in Perms:
             return True
         return False
 
@@ -33,7 +37,7 @@ async def Repeat(Bot, Msg, Args):
 
 # Create Command Statements
 
-createCommand("repeat", "Repeats what the user says after command.", Repeat, None)
+createCommand("repeat", "Repeats what the user says after command.", Repeat, Permissions.Default)
 
 # Main Bot Bit
 
