@@ -1,9 +1,9 @@
 # DiscordStuffs
 A repository for a bunch of Discord bots in my server.
 
-|Bots|Status|Project|Useable|
+|Bots|Status|Progress|Useable|
 |-------------|:-------------:|:---------:|:-------:|
-|Kazuki|Missing Files|None|No|
+|Kazuki|Missing Files|N/A|No|
 |Shalltear|Missing Files + Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|No|
 
 
