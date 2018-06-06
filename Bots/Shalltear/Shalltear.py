@@ -35,9 +35,59 @@ def createCommand(Call, Description, Function, Perms):
 async def Repeat(Bot, Msg, Args):
     await Bot.send_message(Msg.channel, Msg)
 
+async def Purge(Bot, Msg, Args):
+    if len(Args) > 0:
+        Limit = Args[0]
+        isInt = True
+        
+        try:
+            int(Limit)
+        except:
+            isInt = False
+        
+        if isInt:
+            Limit = int(Limit)
+            if Limit > 100:
+                Limit = 100
+            elif Limit < 0:
+                Limit = 0
+            
+            Limit += 1 # Users Messages
+            
+            await Bot.purge_from(Msg.channel, limit = Limit)
+        else:
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", " + str(Limit) + " is not a number.")
+    else: # Forgot to say how many? No problem.
+        await tmp = Bot.send_message(Msg.channel, Msg.author.mention + ", How many messages do you want to try to delete?")
+        await Ans = Bot.wait_for_message(timeout = 10, autor = Msg.author, channel = Msg.channel)
+        
+        await Bot.delete_message(tmp)
+        if Ans != None:
+            Limit = Args[0]
+            isInt = True
+
+            try:
+                int(Limit)
+            except:
+                isInt = False
+
+            if isInt:
+                Limit = int(Limit)
+                if Limit > 100:
+                    Limit = 100
+                elif Limit < 0:
+                    Limit = 0
+                
+                Limit += 2 # Users Messages
+
+                await Bot.purge_from(Msg.channel, limit = Limit)
+            else:
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", " + str(Limit) + " is not a number.")
+
 # Create Command Statements
 
 createCommand("repeat", "Repeats what the user says after command.", Repeat, Permissions.Default)
+createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions.Administrator)
 
 # Main Bot Bit
 
