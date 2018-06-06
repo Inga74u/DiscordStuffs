@@ -24,11 +24,16 @@ class _createCommand:
         return False
 
 def createCommand(Call, Description, Function, Perms):
-    return __createCommand(Call, Description, Function, Perms)
+    Commands[Call] = __createCommand(Call, Description, Function, Perms)
 
 # Command Functions
 
+async def Repeat(Bot, Msg, Args):
+    await Bot.send_message(Msg.channel, Msg)
+
 # Create Command Statements
+
+createCommand("repeat", "Repeats what the user says after command.", Repeat, None)
 
 # Main Bot Bit
 
