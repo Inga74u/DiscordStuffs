@@ -16,6 +16,8 @@ DataFile = ".\\Bot\\Data.json"
 def cls():
     print("\n"*150)
 
+# Load Data
+
 cls()
 
 try:
@@ -42,6 +44,8 @@ except:
     
     with open(DataFile, "w") as DF:
         json.dump(Data, DF, indent = 4)
+
+# Create Command Stuffs
 
 class _createCommand:
     def __init__(self, Call, Description, Function, Perms, PermMod):
@@ -120,10 +124,19 @@ async def Purge(Bot, Msg, Args):
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", " + str(Limit) + " is not a number.")
 
+async def ListCommands(Bot, Msg, Args):
+    Cmds = "***Commands***\n"
+    
+    for x in Commands:
+        Cmds += "\n**" + x + "** ```" + Commands[x].Description + "```"
+    
+    await Bot.send_message(Msg.channel, Msg.author.mention + ",\n" + Cmds)
+                
 # Create Command Statements
 
 createCommand("repeat", "Repeats what the user says after command.", Repeat, Permissions.Default)
 createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions.Administrator)
+createCommand("commands", "List all commands.", ListCommands, Permissions.Default)
 
 # Main Bot Bit
 
