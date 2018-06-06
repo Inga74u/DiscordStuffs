@@ -19,7 +19,7 @@ class _createCommand:
     def PermCheck(self, Msg):
         Perms = Msg.author.server_permissions
         
-        if Perms.administrator or Perms >= self.Perms:
+        if self.Perms == None or Perms.administrator or Perms >= self.Perms:
             return True
         return False
 
@@ -48,7 +48,8 @@ async def on_message(Msg):
             
             Cmd = Data[0]
             rem Data[0]
-            if Cmd in Commands: # Is the message a real command?
+            if Cmd.lower() in Commands: # Is the message a real command?
+                Msg.content = Mg.content[len(Cmd)+1:]
                 Commands[Cmd].Do(bot, Msg, Data)
 
 # await bot.run('email', 'password')
