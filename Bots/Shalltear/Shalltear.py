@@ -3,11 +3,14 @@ import discord
 import json
 
 from Bot import Permissions
+from Bot import osuipy
 
 Commands = {}
 Token = ""
 Prefix = ""
 dPrefix = "!"
+OsuCmds = False
+OsuKey = None
 
 DataFile = ".\\Bot\\Data.json"
 
@@ -26,6 +29,8 @@ try:
     
     Token = Data["BotConfig"]["Token"]
     Prefix = Data["BotConfig"]["Prefix"]
+    OsuCmds = Data["BotConfig"]["OsuCmds"]
+    OsuKey = Data["BotConfig"]["OsuKey"]
 except:
     while len(Prefix.strip()) == 0:
         Prefix = input("Please enter bot prefix: ")
@@ -38,7 +43,9 @@ except:
     Data = {
         "BotConfig": {
             "Token": Token,
-            "Prefix": Prefix
+            "Prefix": Prefix,
+            "OsuCmds": False,
+            "OsuKey": None
         }
     }
     
@@ -131,12 +138,52 @@ async def ListCommands(Bot, Msg, Args):
         Cmds += "\n**" + x + "** ```" + Commands[x].Description + "```"
     
     await Bot.send_message(Msg.channel, Msg.author.mention + ",\n" + Cmds)
-                
+     
+async def Osu(Bot, Msg, Args):
+    if OsuCmds:
+        async def Best(Name, Mode):
+            Best = osuipy.get_user_best(Name, Mode, 1)
+
+            if Best != None:
+                pass # Do stuff
+            else:
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", Either user wasn't found, or they have not played this mode yet.")
+
+        Type = "standard"
+        Name = "WagwanPiftinWhatsYourBBMPinHitMeUp" # Idk, okie?
+        Mode = osuipy.Modes.standard
+
+        if Args > 0:
+            Type = Args[0].lower()
+
+        if Args == 3:
+            Name = Args[1]
+            Mode = Args[2].lower()
+
+        if Mode == "standard":
+            Mode = osuipy.Modes.standard()
+        elif Mode == "mania":
+            Mode = osuipy.Modes.mania()
+        elif Mode == "ctb":
+            Mode = osuipy.Modes.ctb()
+        elif Mode == "taiko":
+            Mode = osuipy.Modes.taiko()
+        else:
+            pass # Do stuff
+
+        if Type = "best":
+            await Best(Name, Mode)
+        else:
+            pass # Do stuff
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", Osu commands are currently disabled.")
+        
 # Create Command Statements
 
 createCommand("repeat", "Repeats what the user says after command.", Repeat, Permissions.Default)
 createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions.Administrator)
 createCommand("commands", "List all commands.", ListCommands, Permissions.Default)
+createCommand("osu", "Get osu data.", Osu, Permissions.Default)
 
 # Main Bot Bit
 
