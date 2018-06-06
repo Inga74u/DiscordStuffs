@@ -1,11 +1,47 @@
 import asyncio
 import discord
+import json
 
 from Bot import Permissions
 
 Commands = {}
-Token = None
+Token = ""
 Prefix = ""
+dPrefix = "!"
+
+DataFile = ".\\Bot\\Data.json"
+
+# Helper Functions
+
+def cls():
+    print("\n"*150)
+
+cls()
+
+try:
+    with open(DataFile, "r") as DF:
+        Data = json.load(DF)
+    
+    Token = Data["BotConfig"]["Token"]
+    Prefix = Data["BotConfig"]["Prefix"]
+except:
+    while len(Prefix.strip()) == 0:
+        Prefix = input("Please enter bot prefix: ")
+        cls()
+    
+    while len(Token.strip()) == 0:
+        Token = input("Please enter bot token: ")
+        cls()
+    
+    Data = {
+        "BotConfig": {
+            "Token": Token,
+            "Prefix": Prefix
+        }
+    }
+    
+    with open(DataFile, "w") as DF:
+        json.dump(Data, DF, indent = 4)
 
 class _createCommand:
     def __init__(self, Call, Description, Function, Perms, PermMod):
