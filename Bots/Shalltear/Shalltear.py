@@ -21,6 +21,13 @@ AudioData = {}
 def cls():
     print("\n"*150)
 
+def testInt(D):
+    try:
+        int(D)
+        return True
+    except:
+        return False
+
 # Load Data
 
 cls()
