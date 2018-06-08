@@ -3,6 +3,7 @@ import discord
 import json
 
 from Bot import Permissions
+from Bot import Youtube
 from Bot import osuipy
 
 Commands = {}
@@ -13,6 +14,7 @@ OsuCmds = False
 OsuKey = None
 
 DataFile = ".\\Bot\\Data.json"
+AudioData = {}
 
 # Helper Functions
 
@@ -177,6 +179,21 @@ async def Osu(Bot, Msg, Args):
             pass # Do stuff
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", Osu commands are currently disabled.")
+
+async def Join(Bot, Msg, Args):
+    if Msg.author.voice.voice_channel != None:
+    
+        try:
+            AData = AudioData[Msg.server.id]
+        except:
+            AudioData[Msg.server.id] = {}
+            AData = AudioData[Msg.server.id]
+
+        try:
+            voice = AData["voice"]
+        except:
+            voice = await client.join_voice_channel(Msg.author.voice.voice_channel)
+            AudioData[Msg.server.id]["voice"] = voice
         
 # Create Command Statements
 
