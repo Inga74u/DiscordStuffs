@@ -189,18 +189,7 @@ async def Osu(Bot, Msg, Args):
 
 async def Join(Bot, Msg, Args):
     if Msg.author.voice.voice_channel != None:
-    
-        try:
-            AData = AudioData[Msg.server.id]
-        except:
-            AudioData[Msg.server.id] = {}
-            AData = AudioData[Msg.server.id]
-
-        try:
-            voice = AData["voice"]
-        except:
-            AudioData[Msg.server.id]["voice"] = None
-            voice = None
+        voice = AudioData[Msg.server.id]["voice"]
         
         if voice == None:
             voice = await client.join_voice_channel(Msg.author.voice.voice_channel)
@@ -214,17 +203,7 @@ async def Join(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to be in a voice channel to use this command.")
 
 async def Leave(Bot, Msg, Args):
-    try:
-        AData = AudioData[Msg.server.id]
-    except:
-        AudioData[Msg.server.id] = {}
-        AData = AudioData[Msg.server.id]
-
-    try:
-        voice = AData["voice"]
-    except:
-        AudioData[Msg.server.id]["voice"] = None
-        voice = None
+    voice = AudioData[Msg.server.id]["voice"]
     
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
@@ -287,7 +266,26 @@ createCommand("play", "Plays the requested video in a voice channel, if found.",
 
 bot = discord.Client()
 
-@client.event
+@bot.event
+async def on_ready():
+    for Server in bot.servers:
+        AudioData[Server.id] = {}
+        AudioData[Server.id]["voice"] = None
+        AudioData[Server.id]["player"] = None
+        AudioData[Server.id]["queue"] = []
+
+@bot.event
+async def on_server_join(Server):
+    AudioData[Server.id] = {}
+    AudioData[Server.id]["voice"] = None
+    AudioData[Server.id]["player"] = None
+    AudioData[Server.id]["queue"] = None
+
+@bot.event
+async def on_server_remove(Server):
+    del AudioData[Server.id]
+        
+@bot.event
 async def on_message(Msg):
     if not Msg.author.bot: # Is author of msg a bot?
         if Msg.content.startswith(Prefix): # Did msg start with [defined prefix]?
