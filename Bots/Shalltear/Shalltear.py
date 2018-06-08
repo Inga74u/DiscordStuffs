@@ -70,7 +70,7 @@ class _createCommand:
             await self.Function(Bot, Msg, Args)
     
     def PermCheck(self, Msg):
-        Perms = self.PermsList(Msg.author.server_permissions)
+        Perms = self.PermMod.PermsList(Msg.author.server_permissions)
         
         if self.Perms == self.PermMod.Default or self.Perms in Perms:
             return True
