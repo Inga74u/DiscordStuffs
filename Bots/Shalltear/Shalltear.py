@@ -205,6 +205,25 @@ async def Join(Bot, Msg, Args):
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", The bot is currently in another channel with users.")
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to be in a voice channel to use this command.")
+
+async def Leave(Bot, Msg, Args):
+    try:
+        AData = AudioData[Msg.server.id]
+    except:
+        AudioData[Msg.server.id] = {}
+        AData = AudioData[Msg.server.id]
+
+    try:
+        voice = AData["voice"]
+    except:
+        AudioData[Msg.server.id]["voice"] = None
+        voice = None
+    
+    if voice != None:
+        if Msg.author.voice.voice_channel == voice.channel:
+            if len(voice.channel.voice_members) == 1:
+                await voice.disconnect()
+            elif #
         
 ## Create Command Statements
 
