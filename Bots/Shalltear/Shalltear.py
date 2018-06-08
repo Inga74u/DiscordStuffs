@@ -192,17 +192,34 @@ async def Join(Bot, Msg, Args):
         try:
             voice = AData["voice"]
         except:
-            voice = await client.join_voice_channel(Msg.author.voice.voice_channel)
-            AudioData[Msg.server.id]["voice"] = voice
+            AudioData[Msg.server.id]["voice"] = None
+            voice = None
         
-# Create Command Statements
+        if voice == None:
+            voice = await client.join_voice_channel(Msg.author.voice.voice_channel)
+        
+        elif voice.is_connected():
+            if len(voice.channel.voice_members) == 0:
+                await voice.move_to(Msg.author.voice.voice_channel)
+            else:
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", The bot is currently in another channel with users.")
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to be in a voice channel to use this command.")
+        
+## Create Command Statements
+
+# General
 
 createCommand("repeat", "Repeats what the user says after command.", Repeat, Permissions.Default)
 createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions.Administrator)
 createCommand("commands", "List all commands.", ListCommands, Permissions.Default)
 createCommand("osu", "Get osu data.", Osu, Permissions.Default)
 
-# Main Bot Bit
+# Voice
+
+createCommand("join", "Joins the voice channel the caller is currently in.", Join, Permissions.Default)
+
+## Main Bot Bit
 
 bot = discord.Client()
 
