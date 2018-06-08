@@ -223,7 +223,14 @@ async def Leave(Bot, Msg, Args):
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
                 await voice.disconnect()
-            elif #
+            elif Permissions.Administrator in Permissions.PermList(Msg.author.server_permissions):
+                await voice.disconnect()
+            else:
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
+        else:
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", You must be in the same channel as me to use this command.")
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", I'm not in a channel to leave!")
         
 ## Create Command Statements
 
@@ -237,6 +244,7 @@ createCommand("osu", "Get osu data.", Osu, Permissions.Default)
 # Voice
 
 createCommand("join", "Joins the voice channel the caller is currently in.", Join, Permissions.Default)
+createCommand("leave", "Leaves the voice channel the bot is currently in.", Leave, Permissions.Default)
 
 ## Main Bot Bit
 
