@@ -239,6 +239,35 @@ async def Leave(Bot, Msg, Args):
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", I'm not in a channel to leave!")
         
+async def Play(Bot, Msg, Args):
+    if Args > 0:
+        q = Args.join(" ")
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what song to play, to play one at all.")
+        return
+    
+    await Join(Bot, Msg, Args)
+    
+    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+        Songs = Youtube.search_list(q)
+        
+        if len(Songs) == 1:
+            player = AudioData[Msg.server.id]['player']
+
+            if player != None:
+                player.stop()
+
+            player = await AudioData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
+            player.volume = 0.5
+            
+            player.start()
+            
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", **Now Playing**\n" + Songs[0]["title"] + "\n\n" + Songs[0]["thumbnail"] + "\nUploaded by " + Songs[0]["chantitle"])
+        else:
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
+    else:
+        return
+        
 ## Create Command Statements
 
 # General
@@ -252,6 +281,7 @@ createCommand("osu", "Get osu data.", Osu, Permissions.Default)
 
 createCommand("join", "Joins the voice channel the caller is currently in.", Join, Permissions.Default)
 createCommand("leave", "Leaves the voice channel the bot is currently in.", Leave, Permissions.Default)
+createCommand("play", "Plays the requested video in a voice channel, if found.", Play, Permissions.Administrator)
 
 ## Main Bot Bit
 
