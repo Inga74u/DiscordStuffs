@@ -36,6 +36,12 @@ def _search_list(**kwargs):
         ChanId = x["snippet"]["channelId"]
         ChanTitle = x["snippet"]["channelTitle"]
         Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+        
+        items.append({"id": Id,
+                      "title": title,
+                      "chanid": ChanId,
+                      "chantitle": ChanTitle,
+                      "thumbnail": Thumb})
     
     return items
 
