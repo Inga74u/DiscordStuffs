@@ -1,6 +1,8 @@
 import asyncio
 import discord
+import time
 import json
+import os
 
 from Bot import Permissions
 from Bot import Youtube
@@ -16,6 +18,10 @@ OsuKey = None
 DataFile = ".\\Bot\\Data.json"
 AudioData = {}
 
+Path = os.path.abspath(".\\External\\ffmpeg\\bin")
+AppPath = os.path.join(Path)
+os.environ["PATH"] += os.pathsep + AppPath
+
 # Helper Functions
 
 def cls():
@@ -27,6 +33,16 @@ def testInt(D):
         return True
     except:
         return False
+
+def join(List, Spacer):
+    String = ""
+
+    for x in List:
+        String += x
+        if x != x[len(x)-1]:
+            String += Spacer
+
+    return String
 
 # Load Data
 
@@ -84,12 +100,12 @@ class _createCommand:
         return False
 
 def createCommand(Call, Description, Function, Perms):
-    Commands[Call] = __createCommand(Call, Description, Function, Perms)
+    Commands[Call] = _createCommand(Call, Description, Function, Perms, Permissions)
 
 # Command Functions
 
 async def Repeat(Bot, Msg, Args):
-    await Bot.send_message(Msg.channel, Msg)
+    await Bot.send_message(Msg.channel, Msg.content)
 
 async def Purge(Bot, Msg, Args):
     if len(Args) > 0:
@@ -108,18 +124,17 @@ async def Purge(Bot, Msg, Args):
             elif Limit < 0:
                 Limit = 0
             
-            Limit += 1 # Users Messages
+            Limit += 1 # Extra Messages
             
             await Bot.purge_from(Msg.channel, limit = Limit)
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", " + str(Limit) + " is not a number.")
     else: # Forgot to say how many? No problem.
-        await tmp = Bot.send_message(Msg.channel, Msg.author.mention + ", How many messages do you want to try to delete?")
-        await Ans = Bot.wait_for_message(timeout = 10, autor = Msg.author, channel = Msg.channel)
-        
-        await Bot.delete_message(tmp)
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", How many messages do you want to try to delete?")
+        Ans = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+
         if Ans != None:
-            Limit = Args[0]
+            Limit = Ans.content
             isInt = True
 
             try:
@@ -134,7 +149,7 @@ async def Purge(Bot, Msg, Args):
                 elif Limit < 0:
                     Limit = 0
                 
-                Limit += 2 # Users Messages
+                Limit += 3 # Extra Messages
 
                 await Bot.purge_from(Msg.channel, limit = Limit)
             else:
@@ -144,7 +159,7 @@ async def ListCommands(Bot, Msg, Args):
     Cmds = "***Commands***\n"
     
     for x in Commands:
-        Cmds += "\n**" + x + "** ```" + Commands[x].Description + "```"
+        Cmds += "\n**" + x.capitalize() + "** ```" + Commands[x].Description + "```"
     
     await Bot.send_message(Msg.channel, Msg.author.mention + ",\n" + Cmds)
      
@@ -180,7 +195,7 @@ async def Osu(Bot, Msg, Args):
         else:
             pass # Do stuff
 
-        if Type = "best":
+        if Type == "best":
             await Best(Name, Mode)
         else:
             pass # Do stuff
@@ -192,8 +207,8 @@ async def Join(Bot, Msg, Args):
         voice = AudioData[Msg.server.id]["voice"]
         
         if voice == None:
-            voice = await client.join_voice_channel(Msg.author.voice.voice_channel)
-        
+            voice = await Bot.join_voice_channel(Msg.author.voice.voice_channel)
+            AudioData[Msg.server.id]["voice"] = voice
         elif voice.is_connected():
             if len(voice.channel.voice_members) == 0:
                 await voice.move_to(Msg.author.voice.voice_channel)
@@ -209,7 +224,7 @@ async def Leave(Bot, Msg, Args):
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
                 await voice.disconnect()
-            elif Permissions.Administrator in Permissions.PermList(Msg.author.server_permissions):
+            elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions):
                 await voice.disconnect()
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
@@ -219,13 +234,14 @@ async def Leave(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", I'm not in a channel to leave!")
         
 async def Play(Bot, Msg, Args):
-    if Args > 0:
-        q = Args.join(" ")
+    if len(Args) > 0:
+        q = join(Args, " ")
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what song to play, to play one at all.")
         return
-    
-    await Join(Bot, Msg, Args)
+
+    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
+        await Join(Bot, Msg, Args)
     
     if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
         Songs = Youtube.search_list(q)
@@ -240,8 +256,10 @@ async def Play(Bot, Msg, Args):
             player.volume = 0.5
             
             player.start()
+
+            AudioData[Msg.server.id]['player'] = player
             
-            await Bot.send_message(Msg.channel, Msg.author.mention + ", **Now Playing**\n" + Songs[0]["title"] + "\n\n" + Songs[0]["thumbnail"] + "\nUploaded by " + Songs[0]["chantitle"])
+            await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
     else:
@@ -268,6 +286,8 @@ bot = discord.Client()
 
 @bot.event
 async def on_ready():
+    time.sleep(.5)
+    
     for Server in bot.servers:
         AudioData[Server.id] = {}
         AudioData[Server.id]["voice"] = None
@@ -293,10 +313,10 @@ async def on_message(Msg):
             Data = Msg.content.split(" ")
             
             Cmd = Data[0]
-            rem Data[0]
+            del Data[0]
             if Cmd.lower() in Commands: # Is the message a real command?
-                Msg.content = Mg.content[len(Cmd)+1:]
-                Commands[Cmd].Do(bot, Msg, Data)
+                Msg.content = Msg.content[len(Cmd)+1:]
+                await Commands[Cmd].Do(bot, Msg, Data)
 
-# await bot.run('email', 'password')
-await bot.run(Token)
+# bot.run('email', 'password')
+bot.run(Token)
