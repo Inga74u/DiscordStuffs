@@ -264,7 +264,11 @@ async def Play(Bot, Msg, Args):
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
     else:
         return
-        
+
+async def Ping(Bot, Msg, Args):
+    if len(Args) == 0:
+        await Bot.send_message(Msg.channel, "Pong!")
+      
 ## Create Command Statements
 
 # General
@@ -273,6 +277,7 @@ createCommand("repeat", "Repeats what the user says after command.", Repeat, Per
 createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions.Administrator)
 createCommand("commands", "List all commands.", ListCommands, Permissions.Default)
 createCommand("osu", "Get osu data.", Osu, Permissions.Default)
+createCommand("ping", "Pong!", Ping, Permissions.Default)
 
 # Voice
 
