@@ -274,6 +274,27 @@ async def Play(Bot, Msg, Args):
     else:
         return
 
+async def Search(Bot, Msg, Args):
+    if len(Args) > 0:
+        q = join(Args, " ")
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what song to play, to play one at all.")
+        return
+
+    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
+        await Join(Bot, Msg, Args)
+    
+    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+        Songs = Youtube.search_list(q)
+        
+        if len(Songs) == 1:
+            AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
+            await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
+        else:
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
+    else:
+        return
+
 async def Ping(Bot, Msg, Args):
     if len(Args) == 0:
         await Bot.send_message(Msg.channel, "Pong!")
@@ -293,6 +314,7 @@ createCommand("ping", "Pong!", Ping, Permissions.Default)
 createCommand("join", "Joins the voice channel the caller is currently in.", Join, Permissions.Default)
 createCommand("leave", "Leaves the voice channel the bot is currently in.", Leave, Permissions.Default)
 createCommand("play", "Plays the requested video in a voice channel, if found.", Play, Permissions.Administrator)
+createCommand("search", "Adds requested video to queue to be played.", Search, Permissions.Default)
 
 ## Main Bot Bit
 
@@ -304,7 +326,6 @@ async def MusicLoop():
         if len(AudioData[Server.id]["queue"]) > 1:
             if AudioData[Server.id]["voice"] != None:
                 if AudioData[Server.id]["voice"].is_connected():
-                    print(5)
                     if AudioData[Server.id]["player"] == None or AudioData[Server.id]["player"].is_done():
                         del AudioData[Server.id]["queue"][0]
                         player = await AudioData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+AudioData[Server.id]["queue"][0])
