@@ -267,6 +267,7 @@ async def Play(Bot, Msg, Args):
 
             AudioData[Msg.server.id]['player'] = player
             AudioData[Msg.server.id]['queue'].insert(0, Songs[0]['id']) # For 'now playing' command
+            del AudioData[Msg.server.id]['queue'][1] # Delete song overwritten
             
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
