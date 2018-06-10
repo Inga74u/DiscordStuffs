@@ -14,6 +14,7 @@ Prefix = ""
 dPrefix = "!"
 OsuCmds = False
 OsuKey = None
+OwnerId = ""
 
 DataFile = ".\\Bot\\Data.json"
 AudioData = {}
@@ -58,56 +59,62 @@ cls()
 try:
     with open(DataFile, "r") as DF:
         Data = json.load(DF)
-    
+
     Token = Data["BotConfig"]["Token"]
     Prefix = Data["BotConfig"]["Prefix"]
     OsuCmds = Data["BotConfig"]["OsuCmds"]
     OsuKey = Data["BotConfig"]["OsuKey"]
+    OwnerId = Data["BotConfig"]["OwnerId"]
 except:
     while len(Prefix.strip()) == 0:
         Prefix = input("Please enter bot prefix: ")
         cls()
-    
+
     while len(Token.strip()) == 0:
         Token = input("Please enter bot token: ")
         cls()
-    
+
+    OwnerId = input("Please enter your user id (Optional): ")
+    cls()
+
     Data = {
         "BotConfig": {
             "Token": Token,
             "Prefix": Prefix,
             "OsuCmds": False,
-            "OsuKey": None
+            "OsuKey": None,
+            "OwnerId": OwnerId
         }
     }
-    
+
     with open(DataFile, "w") as DF:
         json.dump(Data, DF, indent = 4)
 
 # Create Command Stuffs
 
 class _createCommand:
-    def __init__(self, Call, Description, Function, Perms, PermMod):
+    def __init__(self, Call, Description, Function, Perms, PermMod, OId):
         self.Call = Call
         self.Description = Description
         self.Function = Function
         self.Perms = Perms
-        
+
         self.PermMod = PermMod
-    
+        self.OwnerId = OId
+
     async def Do(self, Bot, Msg, Args):
         if self.PermCheck(Msg):
             await self.Function(Bot, Msg, Args)
-    
+
     def PermCheck(self, Msg):
         Perms = self.PermMod.PermsList(Msg.author.server_permissions)
-        
-        if self.Perms == self.PermMod.Default or self.Perms in Perms:
+
+        if self.Perms == self.PermMod.Default or self.Perms in Perms or Msg.author.id == self.OId:
             return True
         return False
 
 def createCommand(Call, Description, Function, Perms):
-    Commands[Call] = _createCommand(Call, Description, Function, Perms, Permissions)
+    Commands[Call] = _createCommand(Call, Description, Function, Perms, Permissions, OwnerId)
 
 # Command Functions
 
@@ -118,21 +125,21 @@ async def Purge(Bot, Msg, Args):
     if len(Args) > 0:
         Limit = Args[0]
         isInt = True
-        
+
         try:
             int(Limit)
         except:
             isInt = False
-        
+
         if isInt:
             Limit = int(Limit)
             if Limit > 100:
                 Limit = 100
             elif Limit < 0:
                 Limit = 0
-            
+
             Limit += 1 # Extra Messages
-            
+
             await Bot.purge_from(Msg.channel, limit = Limit)
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", " + str(Limit) + " is not a number.")
@@ -155,7 +162,7 @@ async def Purge(Bot, Msg, Args):
                     Limit = 100
                 elif Limit < 0:
                     Limit = 0
-                
+
                 Limit += 3 # Extra Messages
 
                 await Bot.purge_from(Msg.channel, limit = Limit)
@@ -164,12 +171,12 @@ async def Purge(Bot, Msg, Args):
 
 async def ListCommands(Bot, Msg, Args):
     Cmds = "***Commands***\n"
-    
+
     for x in Commands:
         Cmds += "\n**" + x.capitalize() + "** ```" + Commands[x].Description + "```"
-    
+
     await Bot.send_message(Msg.channel, Msg.author.mention + ",\n" + Cmds)
-     
+
 async def Osu(Bot, Msg, Args):
     if OsuCmds:
         async def Best(Name, Mode):
@@ -212,7 +219,7 @@ async def Osu(Bot, Msg, Args):
 async def Join(Bot, Msg, Args):
     if Msg.author.voice.voice_channel != None:
         voice = AudioData[Msg.server.id]["voice"]
-        
+
         if voice == None:
             voice = await Bot.join_voice_channel(Msg.author.voice.voice_channel)
             AudioData[Msg.server.id]["voice"] = voice
@@ -226,7 +233,7 @@ async def Join(Bot, Msg, Args):
 
 async def Leave(Bot, Msg, Args):
     voice = AudioData[Msg.server.id]["voice"]
-    
+
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
@@ -239,7 +246,7 @@ async def Leave(Bot, Msg, Args):
             await Bot.send_message(Msg.channel, Msg.author.mention + ", You must be in the same channel as me to use this command.")
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", I'm not in a channel to leave!")
-        
+
 async def Play(Bot, Msg, Args):
     if len(Args) > 0:
         q = join(Args, " ")
@@ -249,10 +256,10 @@ async def Play(Bot, Msg, Args):
 
     if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
         await Join(Bot, Msg, Args)
-    
+
     if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
         Songs = Youtube.search_list(q)
-        
+
         if len(Songs) == 1:
             #AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
             player = AudioData[Msg.server.id]['player']
@@ -262,13 +269,13 @@ async def Play(Bot, Msg, Args):
 
             player = await AudioData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
             player.volume = 0.5
-            
+
             player.start()
 
             AudioData[Msg.server.id]['player'] = player
             AudioData[Msg.server.id]['queue'].insert(0, Songs[0]['id']) # For 'now playing' command
             del AudioData[Msg.server.id]['queue'][1] # Delete song overwritten
-            
+
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
@@ -284,10 +291,10 @@ async def Search(Bot, Msg, Args):
 
     if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
         await Join(Bot, Msg, Args)
-    
+
     if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
         Songs = Youtube.search_list(q)
-        
+
         if len(Songs) == 1:
             AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
@@ -299,7 +306,7 @@ async def Search(Bot, Msg, Args):
 async def Ping(Bot, Msg, Args):
     if len(Args) == 0:
         await Bot.send_message(Msg.channel, "Pong!")
-      
+
 ## Create Command Statements
 
 # General
@@ -335,7 +342,7 @@ async def MusicLoop():
 
                         AudioData[Server.id]["player"] = player
         await asyncio.sleep(.1)
-                    
+
 
     schedule_coroutine(MusicLoop())
 
@@ -343,7 +350,7 @@ async def MusicLoop():
 @bot.event
 async def on_ready():
     time.sleep(.5)
-    
+
     for Server in bot.servers:
         AudioData[Server.id] = {}
         AudioData[Server.id]["voice"] = None
@@ -362,14 +369,14 @@ async def on_server_join(Server):
 @bot.event
 async def on_server_remove(Server):
     del AudioData[Server.id]
-        
+
 @bot.event
 async def on_message(Msg):
     if not Msg.author.bot: # Is author of msg a bot?
         if Msg.content.startswith(Prefix): # Did msg start with [defined prefix]?
             Msg.content = Msg.content[len(Prefix):]
             Data = Msg.content.split(" ")
-            
+
             Cmd = Data[0]
             del Data[0]
             if Cmd.lower() in Commands: # Is the message a real command?
