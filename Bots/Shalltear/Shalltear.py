@@ -44,6 +44,13 @@ def join(List, Spacer):
 
     return String
 
+def schedule_coroutine(target, loop = None):
+    if asyncio.iscoroutine(target):
+        return asyncio.ensure_future(target, loop = loop)
+    raise TypeError("target must be a coroutine, "
+
+                    "not {!r}".format(type(target)))
+
 # Load Data
 
 cls()
@@ -247,6 +254,7 @@ async def Play(Bot, Msg, Args):
         Songs = Youtube.search_list(q)
         
         if len(Songs) == 1:
+            #AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
             player = AudioData[Msg.server.id]['player']
 
             if player != None:
@@ -258,6 +266,7 @@ async def Play(Bot, Msg, Args):
             player.start()
 
             AudioData[Msg.server.id]['player'] = player
+            AudioData[Msg.server.id]['queue'].insert(0, Songs[0]['id']) # For 'now playing' command
             
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
@@ -290,6 +299,26 @@ createCommand("play", "Plays the requested video in a voice channel, if found.",
 bot = discord.Client()
 
 @bot.event
+async def MusicLoop():
+    for Server in bot.servers:
+        if len(AudioData[Server.id]["queue"]) > 1:
+            if AudioData[Server.id]["voice"] != None:
+                if AudioData[Server.id]["voice"].is_connected():
+                    print(5)
+                    if AudioData[Server.id]["player"] == None or AudioData[Server.id]["player"].is_done():
+                        del AudioData[Server.id]["queue"][0]
+                        player = await AudioData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+AudioData[Server.id]["queue"][0])
+                        player.volume = .25
+                        player.start()
+
+                        AudioData[Server.id]["player"] = player
+        await asyncio.sleep(.1)
+                    
+
+    schedule_coroutine(MusicLoop())
+
+
+@bot.event
 async def on_ready():
     time.sleep(.5)
     
@@ -297,14 +326,16 @@ async def on_ready():
         AudioData[Server.id] = {}
         AudioData[Server.id]["voice"] = None
         AudioData[Server.id]["player"] = None
-        AudioData[Server.id]["queue"] = []
+        AudioData[Server.id]["queue"] = [None]
+
+    schedule_coroutine(MusicLoop())
 
 @bot.event
 async def on_server_join(Server):
     AudioData[Server.id] = {}
     AudioData[Server.id]["voice"] = None
     AudioData[Server.id]["player"] = None
-    AudioData[Server.id]["queue"] = None
+    AudioData[Server.id]["queue"] = [None]
 
 @bot.event
 async def on_server_remove(Server):
