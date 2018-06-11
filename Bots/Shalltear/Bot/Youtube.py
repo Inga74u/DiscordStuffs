@@ -43,3 +43,85 @@ def _search_list(client, **kwargs):
     
     return items
 
+def search_playlist(query, mResults = 1):
+    pList = _search_playlist(client,
+                             part = 'snippet',
+                             maxResults = mResults,
+                             q = query,
+                             type = "playlist")
+
+    return pList
+
+
+def _search_playlist(client, **kwargs):
+    response = client.search().list(**kwargs).execute()
+    
+    items = []
+    for x in response['items']:
+        Id = x["id"]["playlistId"]
+        Title = x["snippet"]["title"]
+        ChanId = x["snippet"]["channelId"]
+        ChanTitle = x["snippet"]["channelTitle"]
+        Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+
+        items.append({"id": Id,
+                      "title": Title,
+                      "chanid": ChanId,
+                      "chantitle": ChanTitle,
+                      "thumbnail": Thumb})
+
+    return items
+
+def get_playlist_items(Id):
+    items = _get_playlist_items(client,
+                                part = 'snippet',
+                                maxResults = 50,
+                                playlistId = Id)
+
+    return items
+
+def _get_playlist_items(client, **kwargs):
+    response = client.playlistItems().list(**kwargs).execute()
+
+    items = []
+    for x in response['items']:
+        Id = x["snippet"]["resourceId"]["videoId"]
+        Title = x["snippet"]["title"]
+        ChanId = x["snippet"]["channelId"]
+        ChanTitle = x["snippet"]["channelTitle"]
+        Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+
+        items.append({"id": Id,
+                      "title": Title,
+                      "chanid": ChanId,
+                      "chantitle": ChanTitle,
+                      "thumbnail": Thumb})
+
+    try:
+        nextPageToken = response["nextPageToken"]
+    except:
+        nextPageToken = None
+
+    while nextPageToken != None:
+        response = client.playlistItems().list(**kwargs, pageToken = nextPageToken).execute()
+
+        for x in response['items']:
+            Id = x["snippet"]["resourceId"]["videoId"]
+            Title = x["snippet"]["title"]
+            ChanId = x["snippet"]["channelId"]
+            ChanTitle = x["snippet"]["channelTitle"]
+            Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+
+            items.append({"id": Id,
+                          "title": Title,
+                          "chanid": ChanId,
+                          "chantitle": ChanTitle,
+                          "thumbnail": Thumb})
+
+        try:
+            nextPageToken = response["nextPageToken"]
+        except:
+            nextPageToken = None
+
+    return items
+        

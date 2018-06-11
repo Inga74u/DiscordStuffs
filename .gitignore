@@ -108,3 +108,4 @@ venv.bak/
 Bots/Shalltear/External/ffmpeg/
 Bots/Shalltear/Bot/Data.json
 Bots/Shalltear/cmd.cmd
+Bots/Shalltear/wrappedstart.cmd
