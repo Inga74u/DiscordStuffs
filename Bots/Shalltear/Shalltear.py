@@ -296,7 +296,7 @@ async def Search(Bot, Msg, Args):
         Songs = Youtube.search_list(q)
 
         if len(Songs) == 1:
-            AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
+            AudioData[Msg.server.id]['queue'].append(Songs[0]) # Add to queue
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
@@ -327,7 +327,7 @@ async def Playlist(Bot, Msg, Args):
                 SongNum = str(len(Songs))
                 
                 for Song in Songs:
-                    AudioData[Msg.server.id]['queue'].append(Song[0]['id']) # Add to queue
+                    AudioData[Msg.server.id]['queue'].append(Song[0]) # Add to queue
                 
                 await Bot.send_message(Msg.channel, Msg.author.mention + ",\nAdded `" + SongNum + "` songs from playlist:\n```" + Playlist[0]['title'] +"```\n\n" + Playlist[0]['thumb'])
             else:
@@ -365,7 +365,7 @@ async def MusicLoop():
                 if AudioData[Server.id]["voice"].is_connected():
                     if AudioData[Server.id]["player"] == None or AudioData[Server.id]["player"].is_done():
                         del AudioData[Server.id]["queue"][0]
-                        player = await AudioData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+AudioData[Server.id]["queue"][0])
+                        player = await AudioData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+AudioData[Server.id]["queue"][0]["id"])
                         player.volume = .25
                         player.start()
 
