@@ -307,6 +307,12 @@ async def Ping(Bot, Msg, Args):
     if len(Args) == 0:
         await Bot.send_message(Msg.channel, "Pong!")
 
+async def Playlist(Bot, Msg, Args):
+    if len(Args) > 0:
+        q = join(Args, " ")
+        
+        
+
 ## Create Command Statements
 
 # General
