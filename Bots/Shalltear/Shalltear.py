@@ -310,8 +310,30 @@ async def Ping(Bot, Msg, Args):
 async def Playlist(Bot, Msg, Args):
     if len(Args) > 0:
         q = join(Args, " ")
+    else:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what playlist you want, for me to add its songs.")
+        return
+    
+    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]['voice'].channel != Msg.author.voice.voice_channel:
+        await Join(Bot, Msg, Args)
+    
+    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+        Playlist = Youtube.search_playlist(q)
         
-        
+        if len(Playlist) == 1:
+            Songs = Youtube.get_playlist_items(Playlist[0]['id'])
+            
+            if len(Songs) > 0:
+                SongNum = str(len(Songs))
+                
+                for Song in Songs:
+                    AudioData[Msg.server.id]['queue'].append(Song[0]['id']) # Add to queue
+                
+                await Bot.send_message(Msg.channel, Msg.author.mention + ",\nAdded `" + SongNum + "` songs from playlist:\n```" + Playlist[0]['title'] +"```\n\n" + Playlist[0]['thumb'])
+            else:
+                await Bot.send_message(Msg.channel, Msg.author.mention + ",\n Playlist was found, but no songs could be added.")
+        else:
+            await Bot.send_message(Msg.channel, Msg.author.mention + ",\nNo playlists were found.")
 
 ## Create Command Statements
 
@@ -329,6 +351,7 @@ createCommand("join", "Joins the voice channel the caller is currently in.", Joi
 createCommand("leave", "Leaves the voice channel the bot is currently in.", Leave, Permissions.Default)
 createCommand("play", "Plays the requested video in a voice channel, if found.", Play, Permissions.Administrator)
 createCommand("search", "Adds requested video to queue to be played.", Search, Permissions.Default)
+createCommand("playlist", "Adds songs from requested playlist to queue to be played.", Playlist, Permissions.Administrator)
 
 ## Main Bot Bit
 
