@@ -233,13 +233,14 @@ async def Join(Bot, Msg, Args):
 
 async def Leave(Bot, Msg, Args):
     voice = AudioData[Msg.server.id]["voice"]
+    player = AudioData[Msg.server.id]["player"]
 
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
                 if player != None:
                     player.stop()
-                    player = AudioData[Msg.server.id]["player"] = None
+                    AudioData[Msg.server.id]["player"] = None
                 await voice.disconnect()
             elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions) or Msg.author.id == OwnerId:
                 if player != None:
