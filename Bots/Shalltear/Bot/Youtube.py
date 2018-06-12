@@ -120,17 +120,20 @@ def _get_playlist_items(client, **kwargs):
         response = client.playlistItems().list(**kwargs, pageToken = nextPageToken).execute()
 
         for x in response['items']:
-            Id = x["snippet"]["resourceId"]["videoId"]
             Title = x["snippet"]["title"]
-            ChanId = x["snippet"]["channelId"]
-            ChanTitle = x["snippet"]["channelTitle"]
-            Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+            Desc = x["snippet"]["description"]
 
-            items.append({"id": Id,
-                          "title": Title,
-                          "chanid": ChanId,
-                          "chantitle": ChanTitle,
-                          "thumbnail": Thumb})
+            if not _is_private(Title, Desc):
+                Id = x["snippet"]["resourceId"]["videoId"]
+                ChanId = x["snippet"]["channelId"]
+                ChanTitle = x["snippet"]["channelTitle"]
+                Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+
+                items.append({"id": Id,
+                              "title": Title,
+                              "chanid": ChanId,
+                              "chantitle": ChanTitle,
+                              "thumbnail": Thumb})
 
         try:
             nextPageToken = response["nextPageToken"]
