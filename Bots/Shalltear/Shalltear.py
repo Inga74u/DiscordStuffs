@@ -370,7 +370,30 @@ async def Playing(Bot, Msg, Args):
         RMsg += "\nUploader: `"+Song['chantitle']+"`"
     
     await Bot.send_message(Msg.channel, RMsg)
-            
+
+async def Skip(Bot, Msg, Args):
+    def notPlaying():
+        if AudioData[Msg.server.id]['voice'] == None:
+            return True
+        elif AudioData[Msg.server.id]['player'] == None:
+            return True
+        elif not AudioData[Msg.server.id]['voice'].is_connected():
+            return True
+        elif not AudioData[Msg.server.id]['player'].is_playing():
+            return True
+        return False
+
+    if notPlaying():
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", I need to be playing something to skip!")
+        return
+
+    if len(AudioData[Msg.server.id]['queue']) == 1:
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", There is no songs in queue to skip to!")
+        return
+
+    player = AudioData[Msg.server.id]['player']
+    player.stop()
+
 ## Create Command Statements
 
 # General
@@ -389,6 +412,7 @@ createCommand("play", "Plays the requested video in a voice channel, if found.",
 createCommand("search", "Adds requested video to queue to be played.", Search, Permissions.Default)
 createCommand("playlist", "Adds songs from requested playlist to queue to be played.", Playlist, Permissions.Administrator)
 createCommand("nowplaying", "Lists what song is currently playing on the bot.", Playing, Permissions.Default)
+createCommand("skip", "Skips currently playing song", Skip, Permissions.Administrator)
 
 ## Main Bot Bit
 
