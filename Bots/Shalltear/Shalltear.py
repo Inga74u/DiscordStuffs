@@ -216,7 +216,21 @@ async def Osu(Bot, Msg, Args):
                                     OsuResp = requests.get(OsuBase + "get_user", Headers)
                                     if OsuResp.status_code == 200:
                                         UserData = json.loads(OsuResp.content.decode('utf-8'))
-                                        # Do stuff with data
+                                        if len(UserData) > 0:
+                                            UserData = UserData[0]
+                                            Name = UserData['username']
+                                            c300 = UserData['count300']
+                                            c100 = UserData['count100']
+                                            c50 = UserData['count50']
+                                            PlayCount = UserData['playcount']
+                                            Rank = UserData['pp_rank']
+                                            CountryRank = UserData['pp_country_rank']
+                                            SS = UserData['count_rank_ss']
+                                            S = UserData['count_rank_ss']
+                                            Acc = UserData['accuracy']
+                                            Level = UserData['level']
+                                        else:
+                                            toSay += "Could not find user data."
                                     else:
                                         toSay += "There was a problem accessing OsuApi."
                                 else:
@@ -252,8 +266,20 @@ async def Osu(Bot, Msg, Args):
                                     
                                     OsuResp = requests.get(OsuBase + "get_user_best", Headers)
                                     if OsuResp.status_code == 200:
-                                        UserBestData = json.loads(OsuResp.content.decode('utf-8'))
-                                        # Do stuff with data
+                                        MapData = json.loads(OsuResp.content.decode('utf-8'))
+                                        if len(MapData) > 0:
+                                            MapData = MapData[0]
+                                            Score = MapData['score']
+                                            MaxCombo = MapData['maxcombo']
+                                            c300 = MapData['count300']
+                                            c100 = MapData['count100']
+                                            c50 = MapData['count50']
+                                            cMiss = MapData['countmiss']
+                                            Rank = MapData['rank']
+                                            PP = MapData['pp']
+                                            Perfect = MapData['perfect']
+                                        else:
+                                            toSay += "Could not find user data."
                                     else:
                                         toSay += "There was a problem accessing OsuApi."
                                 else:
