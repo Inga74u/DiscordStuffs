@@ -233,17 +233,18 @@ async def Join(Bot, Msg, Args):
 
 async def Leave(Bot, Msg, Args):
     voice = AudioData[Msg.server.id]["voice"]
-    player = AudioData[Msg.server.id]["player"]
 
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
                 if player != None:
                     player.stop()
+                    player = AudioData[Msg.server.id]["player"] = None
                 await voice.disconnect()
             elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions) or Msg.author.id == OwnerId:
                 if player != None:
                     player.stop()
+                    player = AudioData[Msg.server.id]["player"] = None
                 await voice.disconnect()
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
@@ -271,7 +272,9 @@ async def Play(Bot, Msg, Args):
 
             if player != None:
                 player.stop()
-
+            
+            await asyncio.sleep(.5)
+            
             player = await AudioData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
             player.volume = 0.5
 
