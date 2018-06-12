@@ -327,9 +327,9 @@ async def Playlist(Bot, Msg, Args):
                 SongNum = str(len(Songs))
                 
                 for Song in Songs:
-                    AudioData[Msg.server.id]['queue'].append(Song[0]) # Add to queue
+                    AudioData[Msg.server.id]['queue'].append(Song) # Add to queue
                 
-                await Bot.send_message(Msg.channel, Msg.author.mention + ",\nAdded `" + SongNum + "` songs from playlist:\n```" + Playlist[0]['title'] +"```\n\n" + Playlist[0]['thumb'])
+                await Bot.send_message(Msg.channel, Msg.author.mention + ",\nAdded `" + SongNum + "` songs from playlist:\n```" + Playlist[0]['title'] +"```\n\n" + Playlist[0]['thumbnail'])
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ",\n Playlist was found, but no songs could be added.")
         else:
