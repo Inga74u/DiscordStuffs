@@ -10,6 +10,12 @@ YoutubeData = {
     "API_Version":  "v3"
     }
 
+def _is_private(Title, Desc):
+    if Title == "Private video":
+        if Desc == "This video is private.":
+            return True
+    return False
+
 def serv(Data):
     return build(Data["API_Service_Name"], Data["API_Version"], developerKey = Data["DevKey"])
 
@@ -29,18 +35,21 @@ def _search_list(client, **kwargs):
     
     items = []
     for x in response['items']:
-        Id = x["id"]["videoId"]
         Title = x["snippet"]["title"]
-        ChanId = x["snippet"]["channelId"]
-        ChanTitle = x["snippet"]["channelTitle"]
-        Thumb = x["snippet"]["thumbnails"]["default"]["url"]
-        
-        items.append({"id": Id,
-                      "title": Title,
-                      "chanid": ChanId,
-                      "chantitle": ChanTitle,
-                      "thumbnail": Thumb,
-                      "playlist": None})
+        Desc = x["snippet"]["description"]
+
+        if not _is_private(Title, Desc):
+            Id = x["id"]["videoId"]
+            ChanId = x["snippet"]["channelId"]
+            ChanTitle = x["snippet"]["channelTitle"]
+            Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+            
+            items.append({"id": Id,
+                          "title": Title,
+                          "chanid": ChanId,
+                          "chantitle": ChanTitle,
+                          "thumbnail": Thumb,
+                          "playlist": None})
     
     return items
 
@@ -86,18 +95,21 @@ def _get_playlist_items(client, **kwargs):
 
     items = []
     for x in response['items']:
-        Id = x["snippet"]["resourceId"]["videoId"]
         Title = x["snippet"]["title"]
-        ChanId = x["snippet"]["channelId"]
-        ChanTitle = x["snippet"]["channelTitle"]
-        Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+        Desc = x["snippet"]["description"]
 
-        items.append({"id": Id,
-                      "title": Title,
-                      "chanid": ChanId,
-                      "chantitle": ChanTitle,
-                      "thumbnail": Thumb,
-                      "playlist": kwargs['playlistId']})
+        if not _is_private(Title, Desc):
+            Id = x["snippet"]["resourceId"]["videoId"]
+            ChanId = x["snippet"]["channelId"]
+            ChanTitle = x["snippet"]["channelTitle"]
+            Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+
+            items.append({"id": Id,
+                          "title": Title,
+                          "chanid": ChanId,
+                          "chantitle": ChanTitle,
+                          "thumbnail": Thumb,
+                          "playlist": kwargs['playlistId']})
 
     try:
         nextPageToken = response["nextPageToken"]
