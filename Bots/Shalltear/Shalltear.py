@@ -394,6 +394,12 @@ async def Skip(Bot, Msg, Args):
     player = AudioData[Msg.server.id]['player']
     player.stop()
 
+async def Clear(Bot, Msg, Args):
+    CSong = AudioData[Msg.server.id]['queue'][0]
+    AudioData[Msg.server.id]['queue'] = [CSong]
+
+    await Bot.send_message(Msg.channel, Msg.author.mention + ", Queue has been cleared.")
+
 ## Create Command Statements
 
 # General
@@ -412,7 +418,8 @@ createCommand("play", "Plays the requested video in a voice channel, if found.",
 createCommand("search", "Adds requested video to queue to be played.", Search, Permissions.Default)
 createCommand("playlist", "Adds songs from requested playlist to queue to be played.", Playlist, Permissions.Administrator)
 createCommand("nowplaying", "Lists what song is currently playing on the bot.", Playing, Permissions.Default)
-createCommand("skip", "Skips currently playing song", Skip, Permissions.Administrator)
+createCommand("skip", "Skips currently playing song.", Skip, Permissions.Administrator)
+createCommand("clear", "Clears queue.", Clear, Permissions.Administrator)
 
 ## Main Bot Bit
 
