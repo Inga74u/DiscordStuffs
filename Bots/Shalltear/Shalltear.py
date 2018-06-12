@@ -1,3 +1,4 @@
+import requests
 import asyncio
 import discord
 import time
@@ -18,6 +19,8 @@ OwnerId = ""
 
 DataFile = ".\\Bot\\Data.json"
 AudioData = {}
+
+OsuBase = "https://osu.ppy.sh/api/"
 
 Path = os.path.abspath(".\\External\\ffmpeg\\bin")
 AppPath = os.path.join(Path)
@@ -179,42 +182,96 @@ async def ListCommands(Bot, Msg, Args):
 
 async def Osu(Bot, Msg, Args):
     if OsuCmds:
-        async def Best(Name, Mode):
-            Best = osuipy.get_user_best(Name, Mode, 1)
-
-            if Best != None:
-                pass # Do stuff
-            else:
-                await Bot.send_message(Msg.channel, Msg.author.mention + ", Either user wasn't found, or they have not played this mode yet.")
-
-        Type = "standard"
-        Name = "WagwanPiftinWhatsYourBBMPinHitMeUp" # Idk, okie?
-        Mode = osuipy.Modes.standard
-
-        if Args > 0:
-            Type = Args[0].lower()
-
-        if Args == 3:
-            Name = Args[1]
-            Mode = Args[2].lower()
-
-        if Mode == "standard":
-            Mode = osuipy.Modes.standard()
-        elif Mode == "mania":
-            Mode = osuipy.Modes.mania()
-        elif Mode == "ctb":
-            Mode = osuipy.Modes.ctb()
-        elif Mode == "taiko":
-            Mode = osuipy.Modes.taiko()
+        tMsg = "What would you like to do?\n`1`. Lookup User\n`2`. Lookup User Best"
+        tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + ", " + tMsg)
+        Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+        
+        await Bot.delete_message(tMsg)
+        toSay = ""
+        if Resp != None:
+            if testInt(Resp.content):
+                Ans = int(Resp.content)
+                if Ans == 1:
+                    tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + ", What is the user's name?")
+                    Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+                    
+                    await Bot.delete_message(tMsg)
+                    if Resp != None:
+                        Name = Resp.content
+                        
+                        tMsg = "What mode would you like to retrieve for?\n`1`. Standard\n`2`. Taiko\n`3`. Catch The Beat\n`4`. Mania"
+                        tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + tMsg)
+                        Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+                        
+                        await Bot.delete_message(tMsg)
+                        if Resp != None:
+                            if testInt(Resp.content):
+                                Mode = int(Resp.content) - 1
+                                if Mode >= 0 and Mode <= 3:
+                                    
+                                    Headers = {"k": OsuKey,
+                                               "u": Name,
+                                               "m": Mode}
+                                    
+                                    OsuResp = requests.get(OsuBase + "get_user", Headers)
+                                    if OsuResp.status_code == 200:
+                                        UserData = json.loads(OsuResp.content.decode('utf-8'))
+                                        # Do stuff with data
+                                    else:
+                                        toSay += "There was a problem accessing OsuApi."
+                                else:
+                                    toSay += "You selected an invalid mode!"
+                            else:
+                                toSay += "You selected an invalid mode!"
+                        else:
+                            toSay += "You did not respond, command timed out."
+                    else:
+                        toSay += "You did not respond, command timed out."
+                elif Ans == 2:
+                    tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + ", What is the user's name?")
+                    Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+                    
+                    await Bot.delete_message(tMsg)
+                    if Resp != None:
+                        Name = Resp.content
+                        
+                        tMsg = "What mode would you like to retrieve for?\n`1`. Standard\n`2`. Taiko\n`3`. Catch The Beat\n`4`. Mania"
+                        tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + tMsg)
+                        Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
+                        
+                        await Bot.delete_message(tMsg)
+                        if Resp != None:
+                            if testInt(Resp.content):
+                                Mode = int(Resp.content) - 1
+                                if Mode >= 0 and Mode <= 3:
+                                    
+                                    Headers = {"k": OsuKey,
+                                               "u": Name,
+                                               "m": Mode,
+                                               "limit": 1}
+                                    
+                                    OsuResp = requests.get(OsuBase + "get_user_best", Headers)
+                                    if OsuResp.status_code == 200:
+                                        UserBestData = json.loads(OsuResp.content.decode('utf-8'))
+                                        # Do stuff with data
+                                    else:
+                                        toSay += "There was a problem accessing OsuApi."
+                                else:
+                                    toSay += "You selected an invalid mode!"
+                            else:
+                                toSay += "You selected an invalid mode!"
+                        else:
+                            toSay += "You did not respond, command timed out."
+                    else:
+                        toSay += "You did not respond, command timed out."
+                else:
+                    toSay += "You selected an invalid option!"
         else:
-            pass # Do stuff
-
-        if Type == "best":
-            await Best(Name, Mode)
-        else:
-            pass # Do stuff
+            toSay += "You did not respond, command timed out."
     else:
-        await Bot.send_message(Msg.channel, Msg.author.mention + ", Osu commands are currently disabled.")
+        toSay += "Osu commands are currently disabled."
+    
+    await Bot.send_message(Msg.channel, Msg.author.mention + ", " + toSay)
 
 async def Join(Bot, Msg, Args):
     if Msg.author.voice.voice_channel != None:
