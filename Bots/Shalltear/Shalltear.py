@@ -335,6 +335,30 @@ async def Playlist(Bot, Msg, Args):
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\nNo playlists were found.")
 
+async def Playing(Bot, Msg, Args):
+    Msg = Msg.author.mention + ","
+    
+    def notPlaying():
+        if AudioData[Msg.server.id]['voice'] == None:
+            return True
+        elif AudioData[Msg.server.id]['player'] == None:
+            return True
+        elif not AudioData[Msg.server.id]['voice'].is_connected():
+            return True
+        elif not AudioData[Msg.server.id]['player'].is_playing():
+            return True
+        return False
+    
+    if notPlaying():
+        Msg += "\nNothing is playing right now."
+    else:
+        Song = AudioData[Msg.server.id]['queue'][0]
+        
+        Msg += "\nTitle: "+Song['title']
+        Msg += "\nUploader: "+Song['chanid']
+    
+    await Bot.send_message(Msg.channel, Msg)
+            
 ## Create Command Statements
 
 # General
@@ -352,6 +376,7 @@ createCommand("leave", "Leaves the voice channel the bot is currently in.", Leav
 createCommand("play", "Plays the requested video in a voice channel, if found.", Play, Permissions.Administrator)
 createCommand("search", "Adds requested video to queue to be played.", Search, Permissions.Default)
 createCommand("playlist", "Adds songs from requested playlist to queue to be played.", Playlist, Permissions.Administrator)
+createCommand("nowplaying", "Lists what song is currently playing on the bot.", Playing, Permissions.Default)
 
 ## Main Bot Bit
 
