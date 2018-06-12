@@ -400,6 +400,32 @@ async def Clear(Bot, Msg, Args):
 
     await Bot.send_message(Msg.channel, Msg.author.mention + ", Queue has been cleared.")
 
+async def Queue(Bot, Msg, Args):
+    Q = AudioData[Msg.server.id]['queue']
+    RMsg = Msg.author.mention+","
+
+    if len(Q) == 1:
+        RMsg += " There are no songs in the queue!"
+
+    elif len(Q) <= 11:
+        RMsg += "\n"
+        for x in range(len(Q)):
+            if x == 0:
+                continue
+            RMsg += "\n" + str(x) + ". " + Q[x]['title']
+
+    elif len(Q) > 10:
+        RMsg += " There are `" + str(len(Q)) + "` songs in the queue.\nThe first ten are:\n"
+        for x in range(len(Q)):
+            if x == 0:
+                continue
+            if x > 11:
+                break
+
+            RMsg += "\n" + str(x) + ". " + Q[x]['title']
+
+    await Bot.send_message(Msg.channel, RMsg)
+
 ## Create Command Statements
 
 # General
@@ -420,6 +446,7 @@ createCommand("playlist", "Adds songs from requested playlist to queue to be pla
 createCommand("nowplaying", "Lists what song is currently playing on the bot.", Playing, Permissions.Default)
 createCommand("skip", "Skips currently playing song.", Skip, Permissions.Administrator)
 createCommand("clear", "Clears queue.", Clear, Permissions.Administrator)
+createCommand("queue", "Details queue.", Queue, Permissions.Default)
 
 ## Main Bot Bit
 
