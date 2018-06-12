@@ -3,7 +3,7 @@ A repository for a bunch of Discord bots in my server.
 
 |Bots      |Status                |Progress                                                      |Useable  |
 |:--------:|:--------------------:|:------------------------------------------------------------:|:-------:|
-|Kazuki    |Missing Files         |[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|No       |
+|Kazuki    |Missing Files         |[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Sometimes|
 |Shalltear |Rework                |[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|
 
 
