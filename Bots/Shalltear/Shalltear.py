@@ -233,12 +233,17 @@ async def Join(Bot, Msg, Args):
 
 async def Leave(Bot, Msg, Args):
     voice = AudioData[Msg.server.id]["voice"]
+    player = AudioData[Msg.server.id]["player"]
 
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
+                if player != None:
+                    player.stop()
                 await voice.disconnect()
-            elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions):
+            elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions) or Msg.author.id == OwnerId:
+                if player != None:
+                    player.stop()
                 await voice.disconnect()
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
@@ -273,7 +278,7 @@ async def Play(Bot, Msg, Args):
             player.start()
 
             AudioData[Msg.server.id]['player'] = player
-            AudioData[Msg.server.id]['queue'].insert(0, Songs[0]['id']) # For 'now playing' command
+            AudioData[Msg.server.id]['queue'].insert(0, Songs[0]) # For 'now playing' command
             del AudioData[Msg.server.id]['queue'][1] # Delete song overwritten
 
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
@@ -336,7 +341,7 @@ async def Playlist(Bot, Msg, Args):
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\nNo playlists were found.")
 
 async def Playing(Bot, Msg, Args):
-    Msg = Msg.author.mention + ","
+    RMsg = Msg.author.mention + ","
     
     def notPlaying():
         if AudioData[Msg.server.id]['voice'] == None:
@@ -350,14 +355,14 @@ async def Playing(Bot, Msg, Args):
         return False
     
     if notPlaying():
-        Msg += "\nNothing is playing right now."
+        RMsg += "\nNothing is playing right now."
     else:
         Song = AudioData[Msg.server.id]['queue'][0]
         
-        Msg += "\nTitle: "+Song['title']
-        Msg += "\nUploader: "+Song['chanid']
+        RMsg += "\nTitle: `"+Song['title']+"`"
+        RMsg += "\nUploader: `"+Song['chantitle']+"`"
     
-    await Bot.send_message(Msg.channel, Msg)
+    await Bot.send_message(Msg.channel, RMsg)
             
 ## Create Command Statements
 
