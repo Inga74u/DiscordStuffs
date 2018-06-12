@@ -226,6 +226,7 @@ async def Join(Bot, Msg, Args):
         elif voice.is_connected():
             if len(voice.channel.voice_members) == 0:
                 await voice.move_to(Msg.author.voice.voice_channel)
+                AudioData[Msg.server.id]["voice"] = voice
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", The bot is currently in another channel with users.")
     else:
@@ -242,11 +243,13 @@ async def Leave(Bot, Msg, Args):
                     player.stop()
                     AudioData[Msg.server.id]["player"] = None
                 await voice.disconnect()
+                AudioData[Msg.server.id]["voice"] = None
             elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions) or Msg.author.id == OwnerId:
                 if player != None:
                     player.stop()
                     player = AudioData[Msg.server.id]["player"] = None
                 await voice.disconnect()
+                AudioData[Msg.server.id]["voice"] = None
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
         else:
@@ -274,12 +277,12 @@ async def Play(Bot, Msg, Args):
             if player != None:
                 player.stop()
             
-            await asyncio.sleep(.5)
-            
             player = await AudioData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
             player.volume = 0.5
 
             player.start()
+
+            await asyncio.sleep(.5)
 
             AudioData[Msg.server.id]['player'] = player
             AudioData[Msg.server.id]['queue'].insert(0, Songs[0]) # For 'now playing' command
