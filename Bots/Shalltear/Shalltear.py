@@ -109,7 +109,7 @@ class _createCommand:
     def PermCheck(self, Msg):
         Perms = self.PermMod.PermsList(Msg.author.server_permissions)
 
-        if self.Perms == self.PermMod.Default or self.Perms in Perms or Msg.author.id == self.OId:
+        if self.Perms == self.PermMod.Default or self.Perms in Perms or Msg.author.id == self.OwnerId:
             return True
         return False
 
