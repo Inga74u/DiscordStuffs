@@ -39,7 +39,8 @@ def _search_list(client, **kwargs):
                       "title": Title,
                       "chanid": ChanId,
                       "chantitle": ChanTitle,
-                      "thumbnail": Thumb})
+                      "thumbnail": Thumb,
+                      "playlist": None})
     
     return items
 
@@ -95,7 +96,8 @@ def _get_playlist_items(client, **kwargs):
                       "title": Title,
                       "chanid": ChanId,
                       "chantitle": ChanTitle,
-                      "thumbnail": Thumb})
+                      "thumbnail": Thumb,
+                      "playlist": kwargs['playlistId']})
 
     try:
         nextPageToken = response["nextPageToken"]
