@@ -106,6 +106,9 @@ venv.bak/
 # Shalltear
 
 Bots/Shalltear/External/ffmpeg/
+Bots/Shalltear/External/git/
+
 Bots/Shalltear/Bot/Data.json
+
 Bots/Shalltear/cmd.cmd
 Bots/Shalltear/wrappedstart.cmd

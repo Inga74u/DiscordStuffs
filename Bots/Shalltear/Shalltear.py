@@ -2,29 +2,46 @@ import urllib.request
 import threading
 import requests
 import asyncio
+import zipfile
 import time
 import json
 import os
 
+os.system("pip install -U discord.py[voice]")
+os.system("pip install --upgrade google-api-python-client")
+os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
+
+os.system("pip install -U youtube_dl")
+
+import discord
+
 try:
-    import discord
+    from tqdm import tqdm
+except:
+    os.system("pip install tqdm")
+
+try:
     File = open(".\\External\\git\\LICENSE.txt", "r")
     File.close()
 except:
     for file in os.listdir(".\\External\\git"):
         os.remove(".\\External\\git\\"+file)
+
+    print("\n"*150)
+    print("Downloading Git, please wait...")
     
-    for file in os.listdir(".\\External\\ffmpeg"):
-        os.remove(".\\External\\ffmpeg\\"+file)
-    
-    os.system("pip install -U discord.py[voice]")
-    os.system("pip install --upgrade google-api-python-client")
-    os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
-    
-    urllib.request.urlretrieve("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", "Git.exe")
+    #urllib.request.urlretrieve("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", "Git.exe")
+    resp = requests.get("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", stream = True)
+
+    with open(".\\External\\git\\Git.exe", "wb") as handle:
+        for data in tqdm(resp.iter_content()):
+            handle.write(data)
+
     print("\n"*150)
     print("Please install to " + os.path.abspath(".\\External\\git"))
-    os.system("Git.exe")
+
+    os.system(".\\External\\git\\Git.exe")
+    os.remove(".\\External\\git\\Git.exe")
     
     try:
         File = open(".\\External\\git\\LICENSE.txt", "r")
@@ -33,10 +50,32 @@ except:
         print("Git was not installed!")
         time.sleep(5)
         exit()
-    
-    os.system(".\\External\\git\\git-cmd.exe git clone https://git.ffmpeg.org/ffmpeg.git .\\External\\ffmpeg")
-    
-    import discord
+
+try:
+    File = open(".\\External\\ffmpeg\\LICENSE.txt", "r")
+    File.close()
+except:
+    try:
+        os.remove(".\\External\\ffmpeg")
+    except:
+        pass
+
+    print("\n"*150)
+    print("Downloading ffmpeg, please wait...")
+    resp = requests.get("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20180613-67747c8-win64-static.zip", stream = True)
+
+    with open(".\\External\\ffmpeg.zip", "wb") as handle:
+        for data in tqdm(resp.iter_content()):
+            handle.write(data)
+
+    print("Extracting ffmpeg...")
+
+    zipf = zipfile.ZipFile(".\\External\\ffmpeg.zip", 'r')
+    zipf.extractall(".\\External\\")
+    zipf.close()
+
+    os.rename(".\\External\\ffmpeg-20180613-67747c8-win64-static", ".\\External\\ffmpeg")
+    os.remove(".\\External\\ffmpeg.zip")
     
 from Bot import Permissions
 from Bot import Youtube
@@ -67,6 +106,11 @@ def UpdateServerSettings():
         for x in ServData:
             Prefix = ServData[x]['prefix']
             OsuChannel = ServData[x]['osuchannel']
+
+            try:
+                S = Data['ServerConfig'][x]
+            except:
+                Data['ServerConfig'][x] = {}
 
             Data['ServerConfig'][x]['Prefix'] = Prefix
             
@@ -126,7 +170,7 @@ try:
     for x in Data["ServerConfig"]:
         ServData[x] = {}
         ServData[x]['prefix'] = Data['ServerConfig'][x]['Prefix']
-        ServData[x]['osuchannel'] = discord.Object(Data['ServerConfig'][x]['OsuChannel']))
+        ServData[x]['osuchannel'] = discord.Object(Data['ServerConfig'][x]['OsuChannel'])
 except:
     while len(Prefix.strip()) == 0:
         Prefix = input("Please enter bot prefix: ")
@@ -701,15 +745,27 @@ async def on_ready():
     time.sleep(.5)
 
     for Server in bot.servers:
+        ServData[Server.id] = {}
         ServData[Server.id]["voice"] = None
         ServData[Server.id]["player"] = None
         ServData[Server.id]["queue"] = [None]
+        ServData[Server.id]["osuchannel"] = None
+        ServData[Server.id]["prefix"] = Prefix
+        
 
     schedule_coroutine(MusicLoop())
 
+    UpdateServerLoop = threading.Thread(target = UpdateServerSettings)
+    UpdateServerLoop.start()
+
+    print("Bot is running.")
+
 @bot.event
 async def on_server_join(Server):
-    ServData[Server.id] = {}
+    try:
+        ServData[Server.id]
+    except:
+        ServData[Server.id] = {}
     ServData[Server.id]["voice"] = None
     ServData[Server.id]["player"] = None
     ServData[Server.id]["queue"] = [None]
@@ -732,9 +788,6 @@ async def on_message(Msg):
             if Cmd.lower() in Commands: # Is the message a real command?
                 Msg.content = Msg.content[len(Cmd)+1:]
                 await Commands[Cmd].Do(bot, Msg, Data)
-
-UpdateServerLoop = threading.Thread(target = UpdateServerSettings)
-UpdateServerLoop.start()
                 
 # bot.run('email', 'password')
 bot.run(Token)
