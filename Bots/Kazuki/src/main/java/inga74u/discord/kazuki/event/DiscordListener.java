@@ -11,8 +11,7 @@ import javax.swing.*;
 
 public class DiscordListener implements EventListener {
     private final CommandMap cmdMap;
-    private JButton terminateBTN;
-    public DiscordListener(CommandMap cmdMap, JButton terminateBTN) {
+    public DiscordListener(CommandMap cmdMap) {
         this.cmdMap = cmdMap;
         this.terminateBTN = terminateBTN;
     }
@@ -26,7 +25,6 @@ public class DiscordListener implements EventListener {
     private void onReady(ReadyEvent re) {
         System.out.println("[JDA Kazuki-MainClass] INFO inga74u.discord.kazuki.event.DiscordListener -  Bot has completed startup and is ready for use!"); // This is pretty much obsolete because in the compiled version there is no visible console
         cmdMap.idle(true); // State of idle by default, note that idle sounds will not play until something else has been played (by that guilds player) before
-        terminateBTN.setEnabled(true);
     }
 
     private void onMessage(MessageReceivedEvent mre) {
