@@ -1,13 +1,39 @@
+import urllib.request
 import requests
 import asyncio
-import discord
 import time
 import json
 import os
 
+try:
+    import discord
+    File = open(".\\External\\git\\LICENSE.txt", "r")
+    File.close()
+except:
+    os.system("pip install -U discord.py[voice]")
+    os.system("pip install --upgrade google-api-python-client")
+    os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
+    
+    urllib.request.urlretrieve("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", "Git.exe")
+    print("\n"*150)
+    print("Please install to " + os.path.abspath(".\\External\\git"))
+    os.system("Git.exe")
+    
+    try:
+        File = open(".\\External\\git\\LICENSE.txt", "r")
+        File.close()
+    except:
+        print("Git was not installed!")
+        time.sleep(5)
+        exit()
+    
+    os.system(".\\External\\git\\git-cmd.exe git clone https://git.ffmpeg.org/ffmpeg.git .\\External\\ffmpeg")
+    
+    
+    
+    
 from Bot import Permissions
 from Bot import Youtube
-from Bot import osuipy
 
 Commands = {}
 Token = ""
