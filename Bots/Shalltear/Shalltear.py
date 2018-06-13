@@ -1,4 +1,5 @@
 import urllib.request
+import threading
 import requests
 import asyncio
 import time
@@ -43,7 +44,6 @@ from Bot import Youtube
 Commands = {}
 Token = ""
 Prefix = ""
-dPrefix = "!"
 OsuCmds = False
 OsuKey = None
 OwnerId = ""
@@ -56,6 +56,29 @@ OsuBase = "https://osu.ppy.sh/api/"
 Path = os.path.abspath(".\\External\\ffmpeg\\bin")
 AppPath = os.path.join(Path)
 os.environ["PATH"] += os.pathsep + AppPath
+
+# Threaded
+
+def UpdateServerSettings():
+    while 1:
+        with open(DataFile, "r") as File:
+            Data = json.load(File)
+
+        for x in ServData:
+            Prefix = ServData[x]['prefix']
+            OsuChannel = ServData[x]['osuchannel']
+
+            Data['ServerConfig'][x]['Prefix'] = Prefix
+            
+            if OsuChannel != None:
+                Data['ServerConfig'][x]['OsuChannel'] = OsuChannel.id
+            else:
+                Data['ServerConfig'][x]['OsuChannel'] = None
+
+        with open(DataFile, "w") as File:
+            json.dump(Data, File, indent = 4)
+        
+        time.sleep(1)
 
 # Helper Functions
 
@@ -99,6 +122,11 @@ try:
     OsuCmds = Data["BotConfig"]["OsuCmds"]
     OsuKey = Data["BotConfig"]["OsuKey"]
     OwnerId = Data["BotConfig"]["OwnerId"]
+    
+    for x in Data["ServerConfig"]:
+        ServData[x] = {}
+        ServData[x]['prefix'] = Data['ServerConfig'][x]['Prefix']
+        ServData[x]['osuchannel'] = discord.Object(Data['ServerConfig'][x]['OsuChannel']))
 except:
     while len(Prefix.strip()) == 0:
         Prefix = input("Please enter bot prefix: ")
@@ -118,7 +146,8 @@ except:
             "OsuCmds": False,
             "OsuKey": None,
             "OwnerId": OwnerId
-        }
+        },
+        "ServerConfig": {}
     }
 
     with open(DataFile, "w") as DF:
@@ -672,7 +701,6 @@ async def on_ready():
     time.sleep(.5)
 
     for Server in bot.servers:
-        ServData[Server.id] = {}
         ServData[Server.id]["voice"] = None
         ServData[Server.id]["player"] = None
         ServData[Server.id]["queue"] = [None]
@@ -685,6 +713,8 @@ async def on_server_join(Server):
     ServData[Server.id]["voice"] = None
     ServData[Server.id]["player"] = None
     ServData[Server.id]["queue"] = [None]
+    ServData[Server.id]["osuchannel"] = None
+    ServData[Server.id]["prefix"] = Prefix
 
 @bot.event
 async def on_server_remove(Server):
@@ -693,8 +723,8 @@ async def on_server_remove(Server):
 @bot.event
 async def on_message(Msg):
     if not Msg.author.bot: # Is author of msg a bot?
-        if Msg.content.startswith(Prefix): # Did msg start with [defined prefix]?
-            Msg.content = Msg.content[len(Prefix):]
+        if Msg.content.startswith(ServData[Msg.server.id]['prefix']): # Did msg start with [defined prefix]?
+            Msg.content = Msg.content[len(ServData[Msg.server.id]['prefix']):]
             Data = Msg.content.split(" ")
 
             Cmd = Data[0]
@@ -703,5 +733,8 @@ async def on_message(Msg):
                 Msg.content = Msg.content[len(Cmd)+1:]
                 await Commands[Cmd].Do(bot, Msg, Data)
 
+UpdateServerLoop = threading.Thread(target = UpdateServerSettings)
+UpdateServerLoop.start()
+                
 # bot.run('email', 'password')
 bot.run(Token)
