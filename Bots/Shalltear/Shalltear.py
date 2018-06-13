@@ -29,8 +29,7 @@ except:
     
     os.system(".\\External\\git\\git-cmd.exe git clone https://git.ffmpeg.org/ffmpeg.git .\\External\\ffmpeg")
     
-    
-    
+    import discord
     
 from Bot import Permissions
 from Bot import Youtube
