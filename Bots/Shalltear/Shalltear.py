@@ -229,6 +229,23 @@ async def Osu(Bot, Msg, Args):
                                             S = UserData['count_rank_ss']
                                             Acc = UserData['accuracy']
                                             Level = UserData['level']
+                                            
+                                            Embed = discord.Embed(title = "User", color = Msg.author.color) # Create Embed
+                                            Embed.set_footer(text = "Osu")
+                                            # Embed.set_image(url = Songs[0]["thumbnail"]) TODO:
+                                            Embed.add_field(name = "Name", value = name)
+                                            Embed.add_field(name = "Accuarcy", value = Acc)
+                                            Embed.add_field(name = "Rank", value = Rank)
+                                            Embed.add_field(name = "Country Rank", value = CountryRank)
+                                            Embed.add_field(name = "Play Count", value = PlayCount)
+                                            Embed.add_field(name = "Level", value = Level)
+                                            Embed.add_field(name = "SS Plays", value = SS)
+                                            Embed.add_field(name = "S Plays", value = S)
+                                            Embed.add_field(name = "300", value = c300)
+                                            Embed.add_field(name = "100", value = c100)
+                                            Embed.add_field(name = "50", value = c50)
+                                            
+                                            await Bot.send_message(Msg.channel, embed = Embed)
                                         else:
                                             toSay += "Could not find user data."
                                     else:
