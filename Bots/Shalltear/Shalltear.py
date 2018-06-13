@@ -555,6 +555,41 @@ async def Queue(Bot, Msg, Args):
 
     await Bot.send_message(Msg.channel, RMsg)
 
+async def PlayingDetails(Bot, Msg, Args):
+    Q = AudioData[Msg.server.id]['queue']
+    player = AudioData[Msg.server.id]['player']
+    
+    def notPlaying():
+        if AudioData[Msg.server.id]['voice'] == None:
+            return True
+        elif AudioData[Msg.server.id]['player'] == None:
+            return True
+        elif not AudioData[Msg.server.id]['voice'].is_connected():
+            return True
+        elif not AudioData[Msg.server.id]['player'].is_playing():
+            return True
+        return False
+    
+    if notPlaying():
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", No song is playing right now!")
+    else:
+        S = Q[0]
+        
+        Embed = discord.Embed(title = "Currently Playing -- Details", color = Msg.author.color)
+        Embed.set_footer(text = "PlayingDetails")
+        Embed.set_image(url = S['thumbnail'])
+        Embed.add_field(name = "Title", value = S['title'])
+        Embed.add_field(name = "Video Link", value = "https://www.youtube.com/watch?v=" + S['id'])
+        Embed.add_field(name = "Channel", value = S['chantitle'])
+        Embed.add_field(name = "Channel Link", value = "https://www.youtube.com/channel/" + S['chanid'])
+        
+        if S['playlist'] != None:
+            Embed.add_field(name = "Retrieved from Playlist", value = "https://www.youtube.com/playlist?list=" + S['playlist'])
+        else:
+            Embed.add_field(name = "Retrieved from Playlist", value = "This song was not retrieved using the playlist command.")
+        
+        await Bot.send_message(Msg.author, embed = Embed)
+
 ## Create Command Statements
 
 # General
@@ -576,6 +611,7 @@ createCommand("nowplaying", "Lists what song is currently playing on the bot.", 
 createCommand("skip", "Skips currently playing song.", Skip, Permissions.Administrator)
 createCommand("clear", "Clears queue.", Clear, Permissions.Administrator)
 createCommand("queue", "Details queue.", Queue, Permissions.Default)
+createCommand("playingdetails", "Gives more details about currently playing song.", PlayingDetails, Permissions.Default)
 
 ## Main Bot Bit
 
