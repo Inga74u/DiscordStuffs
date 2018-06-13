@@ -16,7 +16,7 @@ Kazuki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u),
 #### Required libraries:  
 [JDA](https://github.com/DV8FromTheWorld/JDA): dv8tion's Discord API in Java  
 [LavaPlayer](https://github.com/sedmelluq/lavaplayer): sedmelluq's powerful audio extention for JDA  
-[JSoup](https://jsoup.org/) A library to simplify: html requests  
+[JSoup](https://jsoup.org/): A library to simplify html requests  
 
 
 
