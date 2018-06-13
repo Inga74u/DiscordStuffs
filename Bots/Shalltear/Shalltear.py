@@ -1,82 +1,131 @@
 import urllib.request
 import threading
 import requests
+import platform
 import asyncio
 import zipfile
 import time
 import json
 import os
 
-os.system("pip install -U discord.py[voice]")
-os.system("pip install --upgrade google-api-python-client")
-os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
-
-os.system("pip install -U youtube_dl")
-
 import discord
 
-try:
-    from tqdm import tqdm
-except:
-    os.system("pip install tqdm")
+def WindowsSetup():
+    os.system("pip install -U discord.py[voice]")
+    os.system("pip install --upgrade google-api-python-client")
+    os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
 
-try:
-    File = open(".\\External\\git\\LICENSE.txt", "r")
-    File.close()
-except:
-    for file in os.listdir(".\\External\\git"):
-        os.remove(".\\External\\git\\"+file)
+    os.system("pip install -U youtube_dl")
 
-    print("\n"*150)
-    print("Downloading Git, please wait...")
-    
-    #urllib.request.urlretrieve("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", "Git.exe")
-    resp = requests.get("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", stream = True)
+    try:
+        from tqdm import tqdm
+    except:
+        os.system("pip install tqdm")
 
-    with open(".\\External\\git\\Git.exe", "wb") as handle:
-        for data in tqdm(resp.iter_content()):
-            handle.write(data)
-
-    print("\n"*150)
-    print("Please install to " + os.path.abspath(".\\External\\git"))
-
-    os.system(".\\External\\git\\Git.exe")
-    os.remove(".\\External\\git\\Git.exe")
-    
     try:
         File = open(".\\External\\git\\LICENSE.txt", "r")
         File.close()
     except:
-        print("Git was not installed!")
-        time.sleep(5)
-        exit()
+        for file in os.listdir(".\\External\\git"):
+            os.remove(".\\External\\git\\"+file)
 
-try:
-    File = open(".\\External\\ffmpeg\\LICENSE.txt", "r")
-    File.close()
-except:
+        print("\n"*150)
+        print("Downloading Git, please wait...")
+        
+        #urllib.request.urlretrieve("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", "Git.exe")
+        resp = requests.get("https://github.com/git-for-windows/git/releases/download/v2.17.1.windows.2/PortableGit-2.17.1.2-64-bit.7z.exe", stream = True)
+
+        with open(".\\External\\git\\Git.exe", "wb") as handle:
+            for data in tqdm(resp.iter_content()):
+                handle.write(data)
+
+        print("\n"*150)
+        print("Please install to " + os.path.abspath(".\\External\\git"))
+
+        os.system(".\\External\\git\\Git.exe")
+        os.remove(".\\External\\git\\Git.exe")
+        
+        try:
+            File = open(".\\External\\git\\LICENSE.txt", "r")
+            File.close()
+        except:
+            print("Git was not installed!")
+            time.sleep(5)
+            exit()
+
     try:
-        os.remove(".\\External\\ffmpeg")
+        File = open(".\\External\\ffmpeg\\LICENSE.txt", "r")
+        File.close()
     except:
-        pass
+        try:
+            os.remove(".\\External\\ffmpeg")
+        except:
+            pass
 
-    print("\n"*150)
-    print("Downloading ffmpeg, please wait...")
-    resp = requests.get("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-20180613-67747c8-win64-static.zip", stream = True)
+        print("\n"*150)
+        print("Downloading ffmpeg, please wait...")
+        resp = requests.get("https://ffmpeg.zeranoe.com/builds/win64/static/ffmpeg-4.0-win64-static.zip", stream = True)
 
-    with open(".\\External\\ffmpeg.zip", "wb") as handle:
-        for data in tqdm(resp.iter_content()):
-            handle.write(data)
+        with open(".\\External\\ffmpeg.zip", "wb") as handle:
+            for data in tqdm(resp.iter_content()):
+                handle.write(data)
 
-    print("Extracting ffmpeg...")
+        print("Extracting ffmpeg...")
 
-    zipf = zipfile.ZipFile(".\\External\\ffmpeg.zip", 'r')
-    zipf.extractall(".\\External\\")
-    zipf.close()
+        zipf = zipfile.ZipFile(".\\External\\ffmpeg.zip", 'r')
+        zipf.extractall(".\\External\\")
+        zipf.close()
 
-    os.rename(".\\External\\ffmpeg-20180613-67747c8-win64-static", ".\\External\\ffmpeg")
-    os.remove(".\\External\\ffmpeg.zip")
+        os.rename(".\\External\\ffmpeg-4.0-win64-static", ".\\External\\ffmpeg")
+        os.remove(".\\External\\ffmpeg.zip")
+
+def MacOSSetup():
+    os.system("pip3 install -U discord.py[voice]")
+    os.system("pip3 install --upgrade google-api-python-client")
+    os.system("pip3 install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
+
+    os.system("pip3 install -U youtube_dl")
+
+    try:
+        from tqdm import tqdm
+    except:
+        os.system("pip3 install tqdm")
     
+    try:
+        File = open(".\\External\\ffmpeg\\bin\\ffmpeg.exec", "r")
+        File.close()
+    except:
+        try:
+            os.remove(".\\External\\ffmpeg")
+        except:
+            pass
+
+        print("\n"*150)
+        print("Downloading ffmpeg, please wait...")
+        resp = requests.get("https://ffmpeg.zeranoe.com/builds/macos64/static/ffmpeg-4.0-macos64-static.zip", stream = True)
+
+        with open(".\\External\\ffmpeg.zip", "wb") as handle:
+            for data in tqdm(resp.iter_content()):
+                handle.write(data)
+
+        print("Extracting ffmpeg...")
+
+        zipf = zipfile.ZipFile(".\\External\\ffmpeg.zip", 'r')
+        zipf.extractall(".\\External\\")
+        zipf.close()
+
+        os.rename(".\\External\\ffmpeg-4.0-macos64-static", ".\\External\\ffmpeg")
+        os.remove(".\\External\\ffmpeg.zip")
+
+if platform.system() == "Windows":
+    WindowsSetup()
+elif platform.system() == "Darwin":
+    MacOSSetup()
+
+Path = os.path.abspath(".\\External\\ffmpeg\\bin")
+AppPath = os.path.join(Path)
+os.environ["PATH"] += os.pathsep + AppPath
+
 from Bot import Permissions
 from Bot import Youtube
 
@@ -91,10 +140,6 @@ DataFile = ".\\Bot\\Data.json"
 ServData = {}
 
 OsuBase = "https://osu.ppy.sh/api/"
-
-Path = os.path.abspath(".\\External\\ffmpeg\\bin")
-AppPath = os.path.join(Path)
-os.environ["PATH"] += os.pathsep + AppPath
 
 # Threaded
 
