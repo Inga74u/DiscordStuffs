@@ -278,6 +278,19 @@ async def Osu(Bot, Msg, Args):
                                             Rank = MapData['rank']
                                             PP = MapData['pp']
                                             Perfect = MapData['perfect']
+                                            
+                                            Embed = discord.Embed(title = "User Best", color = Msg.author.color) # Create Embed
+                                            Embed.set_footer(text = "Osu")
+                                            # Embed.set_image(url = Songs[0]["thumbnail"]) TODO:
+                                            Embed.add_field(name = "Score", value = score)
+                                            Embed.add_field(name = "PP", value = PP)
+                                            Embed.add_field(name = "Combo", value = MaxCombo)
+                                            Embed.add_field(name = "Rank", value = Rank)
+                                            Embed.add_field(name = "300", value = c300)
+                                            Embed.add_field(name = "100", value = c100)
+                                            Embed.add_field(name = "50", value = c50)
+                                            
+                                            await Bot.send_message(Msg.channel, embed = Embed)
                                         else:
                                             toSay += "Could not find user data."
                                     else:
@@ -392,14 +405,15 @@ async def Search(Bot, Msg, Args):
 
         if len(Songs) == 1:
             AudioData[Msg.server.id]['queue'].append(Songs[0]) # Add to queue
-            '''
-            Embed = discord.Embed(title = "Song Added To Queue", color = Msg.author.color)
+            
+            Embed = discord.Embed(title = "Song Added To Queue", color = Msg.author.color) # Create Embed
             Embed.set_footer(text = "Search")
-            Embed.set_image(url = Songs[0]["thumbnail"]
+            Embed.set_image(url = Songs[0]["thumbnail"])
             Embed.add_field(name = "Title", value = Songs[0]["title"])
             Embed.add_field(name = "Uploader", value = Songs[0]["chantitle"])
-            '''
-            await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
+            
+            # await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
+            await Bot.send_message(Msg.channel, embed = Embed)
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
     else:
@@ -431,6 +445,12 @@ async def Playlist(Bot, Msg, Args):
                 for Song in Songs:
                     AudioData[Msg.server.id]['queue'].append(Song) # Add to queue
                 
+                Embed = discord.Embed(title = "Songs Added To Queue", color = Msg.author.color) # Create Embed
+                Embed.set_footer(text = "Playlist")
+                Embed.set_image(url = Playlist[0]["thumbnail"])
+                Embed.add_field(name = "Playlist", value = Songs[0]["title"])
+                Embed.add_field(name = "Songs Added", value = SongNum)
+                
                 await Bot.send_message(Msg.channel, Msg.author.mention + ",\nAdded `" + SongNum + "` songs from playlist:\n```" + Playlist[0]['title'] +"```\n\n" + Playlist[0]['thumbnail'])
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ",\n Playlist was found, but no songs could be added.")
@@ -438,7 +458,6 @@ async def Playlist(Bot, Msg, Args):
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\nNo playlists were found.")
 
 async def Playing(Bot, Msg, Args):
-    RMsg = Msg.author.mention + ","
     
     def notPlaying():
         if AudioData[Msg.server.id]['voice'] == None:
@@ -452,14 +471,17 @@ async def Playing(Bot, Msg, Args):
         return False
     
     if notPlaying():
-        RMsg += "\nNothing is playing right now."
+        await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing is playing right now.")
     else:
         Song = AudioData[Msg.server.id]['queue'][0]
         
-        RMsg += "\nTitle: `"+Song['title']+"`"
-        RMsg += "\nUploader: `"+Song['chantitle']+"`"
+        Embed = discord.Embed(title = "Now Playing", color = Msg.author.color) # Create Embed
+        Embed.set_footer(text = "Now Playing")
+        Embed.set_image(url = Song["thumbnail"])
+        Embed.add_field(name = "Title", value = Song["title"])
+        Embed.add_field(name = "Uploader", value = Song["chantitle"])
     
-    await Bot.send_message(Msg.channel, RMsg)
+        await Bot.send_message(Msg.channel, embed = Embed)
 
 async def Skip(Bot, Msg, Args):
     def notPlaying():
