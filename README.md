@@ -1,15 +1,18 @@
 # DiscordStuffs
 A repository for a bunch of Discord bots in my server.
 
-|Bots      |Status                |Progress                                                      |Useable  |
-|:--------:|:--------------------:|:------------------------------------------------------------:|:-------:|
-|Kazuki    |Missing Files         |[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Sometimes|
-|Shalltear |Rework                |[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|
+|Bots      |Status                |Progress                                                      |Useable               |
+|:--------:|:--------------------:|:------------------------------------------------------------:|:--------------------:|
+|Kazuki    |Missing Files         |[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets)|
+|Shalltear |Rework                |[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes             |
 
 
 
 ## Kazuki
-Kazuki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u), currently it is a part of his own Java program 'Thanatos' and has to be detached from said program to be uploaded everytime.
+Kazuki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u), currently it is a part of his own Java program 'Thanatos' and has to be detached from said program to be uploaded everytime. Required libraries: 
+[JDA](https://github.com/DV8FromTheWorld/JDA)
+[LavaPlayer](https://github.com/sedmelluq/lavaplayer)
+[JSoup](https://jsoup.org/)
 
 
 
