@@ -1,11 +1,11 @@
 # DiscordStuffs
 A repository for a bunch of Discord bots in my server.
 
-|Bots      |Status                |Progress                                                      |Useable               |
-|:--------:|:--------------------:|:------------------------------------------------------------:|:--------------------:|
-|[Kazuki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Kazuki)|Missing Game API's|[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets)|
-|[Shalltear](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Shalltear)|Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|
-|[Miniwa](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Miniwa)|Under Construction|[Project](https://github.com/Inga74u/DiscordStuffs/projects/4)|No|
+|Bots      |Status                |Progress                                                      |Useable               |Language|
+|:--------:|:--------------------:|:------------------------------------------------------------:|:--------------------:|:------:|
+|[Kazuki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Kazuki)|Missing Game API's|[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets)|Java|
+|[Shalltear](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Shalltear)|Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|Python|
+|[Miniwa](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Miniwa)|Under Construction|[Project](https://github.com/Inga74u/DiscordStuffs/projects/4)|No|JavaScript|
 
 
 
