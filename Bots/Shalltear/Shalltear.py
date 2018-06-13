@@ -536,19 +536,11 @@ async def Play(Bot, Msg, Args):
             #ServData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
             player = ServData[Msg.server.id]['player']
 
+            ServData[Msg.server.id]['queue'].insert(1, Songs[0])
+            
             if player != None:
                 player.stop()
-            
-            player = await ServData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
-            player.volume = 0.5
-
-            player.start()
-
-            await asyncio.sleep(.5)
-
-            ServData[Msg.server.id]['player'] = player
-            ServData[Msg.server.id]['queue'].insert(0, Songs[0]) # For 'now playing' command
-            del ServData[Msg.server.id]['queue'][1] # Delete song overwritten
+                ServData[Msg.server.id]['player'] = None
 
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
@@ -697,7 +689,7 @@ async def Queue(Bot, Msg, Args):
         for x in range(len(Q)):
             if x == 0:
                 continue
-            if x > 11:
+            if x > 10:
                 break
 
             RMsg += "\n" + str(x) + ". " + Q[x]['title']
