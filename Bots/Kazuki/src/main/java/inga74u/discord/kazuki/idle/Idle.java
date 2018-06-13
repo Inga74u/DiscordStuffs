@@ -26,7 +26,7 @@ public class Idle implements Runnable {
                 for(MusicPlayer player : players) {
                     if (player.getGuild().getAudioManager().isConnected() && player.idle) {
                         if (player.getListener().getTracks().isEmpty() && player.getPlayer().getPlayingTrack() == null) {
-                            manager.loadStealth(player, RandomReturnModule.idleVoice()); // Tell the music manager to load a track without a message.
+                            manager.loadTrack(player, RandomReturnModule.idleVoice()); // Tell the music manager to load a track without a message.
                         }
                     }
                 }
