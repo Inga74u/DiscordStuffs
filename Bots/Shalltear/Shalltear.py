@@ -10,6 +10,12 @@ try:
     File = open(".\\External\\git\\LICENSE.txt", "r")
     File.close()
 except:
+    for file in os.listdir(".\\External\\git"):
+        os.remove(".\\External\\git\\"+file)
+    
+    for file in os.listdir(".\\External\\ffmpeg"):
+        os.remove(".\\External\\ffmpeg\\"+file)
+    
     os.system("pip install -U discord.py[voice]")
     os.system("pip install --upgrade google-api-python-client")
     os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
