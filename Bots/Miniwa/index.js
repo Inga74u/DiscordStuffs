@@ -1,5 +1,5 @@
 const Discord = require('discord.js');
-cosnt Secrets = require('Secrets.js');
+const Secrets = require('Secrets.js');
 const client = new Discord.Client();
 
 client.on('ready', () => {
