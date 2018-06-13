@@ -54,7 +54,7 @@ def schedule_coroutine(target, loop = None):
     raise TypeError("target must be a coroutine, "
 
                     "not {!r}".format(type(target)))
-
+    
 # Load Data
 
 cls()
@@ -392,6 +392,13 @@ async def Search(Bot, Msg, Args):
 
         if len(Songs) == 1:
             AudioData[Msg.server.id]['queue'].append(Songs[0]) # Add to queue
+            '''
+            Embed = discord.Embed(title = "Song Added To Queue", color = Msg.author.color)
+            Embed.set_footer(text = "Search")
+            Embed.set_image(url = Songs[0]["thumbnail"]
+            Embed.add_field(name = "Title", value = Songs[0]["title"])
+            Embed.add_field(name = "Uploader", value = Songs[0]["chantitle"])
+            '''
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Added to Queue**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
             await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing found.")
