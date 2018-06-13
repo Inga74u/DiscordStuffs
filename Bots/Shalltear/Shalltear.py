@@ -49,7 +49,7 @@ OsuKey = None
 OwnerId = ""
 
 DataFile = ".\\Bot\\Data.json"
-AudioData = {}
+ServData = {}
 
 OsuBase = "https://osu.ppy.sh/api/"
 
@@ -362,38 +362,38 @@ async def Osu(Bot, Msg, Args):
 
 async def Join(Bot, Msg, Args):
     if Msg.author.voice.voice_channel != None:
-        voice = AudioData[Msg.server.id]["voice"]
+        voice = ServData[Msg.server.id]["voice"]
 
         if voice == None:
             voice = await Bot.join_voice_channel(Msg.author.voice.voice_channel)
-            AudioData[Msg.server.id]["voice"] = voice
+            ServData[Msg.server.id]["voice"] = voice
         elif voice.is_connected():
             if len(voice.channel.voice_members) == 0:
                 await voice.move_to(Msg.author.voice.voice_channel)
-                AudioData[Msg.server.id]["voice"] = voice
+                ServData[Msg.server.id]["voice"] = voice
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", The bot is currently in another channel with users.")
     else:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to be in a voice channel to use this command.")
 
 async def Leave(Bot, Msg, Args):
-    voice = AudioData[Msg.server.id]["voice"]
-    player = AudioData[Msg.server.id]["player"]
+    voice = ServData[Msg.server.id]["voice"]
+    player = ServData[Msg.server.id]["player"]
 
     if voice != None:
         if Msg.author.voice.voice_channel == voice.channel:
             if len(voice.channel.voice_members) == 1:
                 if player != None:
                     player.stop()
-                    AudioData[Msg.server.id]["player"] = None
+                    ServData[Msg.server.id]["player"] = None
                 await voice.disconnect()
-                AudioData[Msg.server.id]["voice"] = None
+                ServData[Msg.server.id]["voice"] = None
             elif Permissions.Administrator in Permissions.PermsList(Msg.author.server_permissions) or Msg.author.id == OwnerId:
                 if player != None:
                     player.stop()
-                    player = AudioData[Msg.server.id]["player"] = None
+                    player = ServData[Msg.server.id]["player"] = None
                 await voice.disconnect()
-                AudioData[Msg.server.id]["voice"] = None
+                ServData[Msg.server.id]["voice"] = None
             else:
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", You can not use this command when there are other people in the voice channel.")
         else:
@@ -408,29 +408,29 @@ async def Play(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what song to play, to play one at all.")
         return
 
-    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
+    if ServData[Msg.server.id]['voice'] == None or ServData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
         await Join(Bot, Msg, Args)
 
-    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+    if ServData[Msg.server.id]['voice'] != None and ServData[Msg.server.id]['voice'].is_connected():
         Songs = Youtube.search_list(q)
 
         if len(Songs) == 1:
-            #AudioData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
-            player = AudioData[Msg.server.id]['player']
+            #ServData[Msg.server.id]['queue'].append(Songs[0]["id"]) # Add to queue
+            player = ServData[Msg.server.id]['player']
 
             if player != None:
                 player.stop()
             
-            player = await AudioData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
+            player = await ServData[Msg.server.id]['voice'].create_ytdl_player("https://www.youtube.com/watch?v="+Songs[0]["id"])
             player.volume = 0.5
 
             player.start()
 
             await asyncio.sleep(.5)
 
-            AudioData[Msg.server.id]['player'] = player
-            AudioData[Msg.server.id]['queue'].insert(0, Songs[0]) # For 'now playing' command
-            del AudioData[Msg.server.id]['queue'][1] # Delete song overwritten
+            ServData[Msg.server.id]['player'] = player
+            ServData[Msg.server.id]['queue'].insert(0, Songs[0]) # For 'now playing' command
+            del ServData[Msg.server.id]['queue'][1] # Delete song overwritten
 
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
@@ -445,14 +445,14 @@ async def Search(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what song to play, to play one at all.")
         return
 
-    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
+    if ServData[Msg.server.id]['voice'] == None or ServData[Msg.server.id]["voice"].channel != Msg.author.voice.voice_channel:
         await Join(Bot, Msg, Args)
 
-    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+    if ServData[Msg.server.id]['voice'] != None and ServData[Msg.server.id]['voice'].is_connected():
         Songs = Youtube.search_list(q)
 
         if len(Songs) == 1:
-            AudioData[Msg.server.id]['queue'].append(Songs[0]) # Add to queue
+            ServData[Msg.server.id]['queue'].append(Songs[0]) # Add to queue
             
             Embed = discord.Embed(title = "Song Added To Queue", color = Msg.author.color) # Create Embed
             Embed.set_footer(text = "Search")
@@ -478,10 +478,10 @@ async def Playlist(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", You need to tell me what playlist you want, for me to add its songs.")
         return
     
-    if AudioData[Msg.server.id]['voice'] == None or AudioData[Msg.server.id]['voice'].channel != Msg.author.voice.voice_channel:
+    if ServData[Msg.server.id]['voice'] == None or ServData[Msg.server.id]['voice'].channel != Msg.author.voice.voice_channel:
         await Join(Bot, Msg, Args)
     
-    if AudioData[Msg.server.id]['voice'] != None and AudioData[Msg.server.id]['voice'].is_connected():
+    if ServData[Msg.server.id]['voice'] != None and ServData[Msg.server.id]['voice'].is_connected():
         Playlist = Youtube.search_playlist(q)
         
         if len(Playlist) == 1:
@@ -491,7 +491,7 @@ async def Playlist(Bot, Msg, Args):
                 SongNum = str(len(Songs))
                 
                 for Song in Songs:
-                    AudioData[Msg.server.id]['queue'].append(Song) # Add to queue
+                    ServData[Msg.server.id]['queue'].append(Song) # Add to queue
                 
                 Embed = discord.Embed(title = "Songs Added To Queue", color = Msg.author.color) # Create Embed
                 Embed.set_footer(text = "Playlist")
@@ -508,20 +508,20 @@ async def Playlist(Bot, Msg, Args):
 async def Playing(Bot, Msg, Args):
     
     def notPlaying():
-        if AudioData[Msg.server.id]['voice'] == None:
+        if ServData[Msg.server.id]['voice'] == None:
             return True
-        elif AudioData[Msg.server.id]['player'] == None:
+        elif ServData[Msg.server.id]['player'] == None:
             return True
-        elif not AudioData[Msg.server.id]['voice'].is_connected():
+        elif not ServData[Msg.server.id]['voice'].is_connected():
             return True
-        elif not AudioData[Msg.server.id]['player'].is_playing():
+        elif not ServData[Msg.server.id]['player'].is_playing():
             return True
         return False
     
     if notPlaying():
         await Bot.send_message(Msg.channel, Msg.author.mention + ", Nothing is playing right now.")
     else:
-        Song = AudioData[Msg.server.id]['queue'][0]
+        Song = ServData[Msg.server.id]['queue'][0]
         
         Embed = discord.Embed(title = "Now Playing", color = Msg.author.color) # Create Embed
         Embed.set_footer(text = "Now Playing")
@@ -533,13 +533,13 @@ async def Playing(Bot, Msg, Args):
 
 async def Skip(Bot, Msg, Args):
     def notPlaying():
-        if AudioData[Msg.server.id]['voice'] == None:
+        if ServData[Msg.server.id]['voice'] == None:
             return True
-        elif AudioData[Msg.server.id]['player'] == None:
+        elif ServData[Msg.server.id]['player'] == None:
             return True
-        elif not AudioData[Msg.server.id]['voice'].is_connected():
+        elif not ServData[Msg.server.id]['voice'].is_connected():
             return True
-        elif not AudioData[Msg.server.id]['player'].is_playing():
+        elif not ServData[Msg.server.id]['player'].is_playing():
             return True
         return False
 
@@ -547,21 +547,21 @@ async def Skip(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, Msg.author.mention + ", I need to be playing something to skip!")
         return
 
-    if len(AudioData[Msg.server.id]['queue']) == 1:
+    if len(ServData[Msg.server.id]['queue']) == 1:
         await Bot.send_message(Msg.channel, Msg.author.mention + ", There is no songs in queue to skip to!")
         return
 
-    player = AudioData[Msg.server.id]['player']
+    player = ServData[Msg.server.id]['player']
     player.stop()
 
 async def Clear(Bot, Msg, Args):
-    CSong = AudioData[Msg.server.id]['queue'][0]
-    AudioData[Msg.server.id]['queue'] = [CSong]
+    CSong = ServData[Msg.server.id]['queue'][0]
+    ServData[Msg.server.id]['queue'] = [CSong]
 
     await Bot.send_message(Msg.channel, Msg.author.mention + ", Queue has been cleared.")
 
 async def Queue(Bot, Msg, Args):
-    Q = AudioData[Msg.server.id]['queue']
+    Q = ServData[Msg.server.id]['queue']
     RMsg = Msg.author.mention+","
 
     if len(Q) == 1:
@@ -587,17 +587,17 @@ async def Queue(Bot, Msg, Args):
     await Bot.send_message(Msg.channel, RMsg)
 
 async def PlayingDetails(Bot, Msg, Args):
-    Q = AudioData[Msg.server.id]['queue']
-    player = AudioData[Msg.server.id]['player']
+    Q = ServData[Msg.server.id]['queue']
+    player = ServData[Msg.server.id]['player']
     
     def notPlaying():
-        if AudioData[Msg.server.id]['voice'] == None:
+        if ServData[Msg.server.id]['voice'] == None:
             return True
-        elif AudioData[Msg.server.id]['player'] == None:
+        elif ServData[Msg.server.id]['player'] == None:
             return True
-        elif not AudioData[Msg.server.id]['voice'].is_connected():
+        elif not ServData[Msg.server.id]['voice'].is_connected():
             return True
-        elif not AudioData[Msg.server.id]['player'].is_playing():
+        elif not ServData[Msg.server.id]['player'].is_playing():
             return True
         return False
     
@@ -651,16 +651,16 @@ bot = discord.Client()
 @bot.event
 async def MusicLoop():
     for Server in bot.servers:
-        if len(AudioData[Server.id]["queue"]) > 1:
-            if AudioData[Server.id]["voice"] != None:
-                if AudioData[Server.id]["voice"].is_connected():
-                    if AudioData[Server.id]["player"] == None or AudioData[Server.id]["player"].is_done():
-                        del AudioData[Server.id]["queue"][0]
-                        player = await AudioData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+AudioData[Server.id]["queue"][0]["id"])
+        if len(ServData[Server.id]["queue"]) > 1:
+            if ServData[Server.id]["voice"] != None:
+                if ServData[Server.id]["voice"].is_connected():
+                    if ServData[Server.id]["player"] == None or ServData[Server.id]["player"].is_done():
+                        del ServData[Server.id]["queue"][0]
+                        player = await ServData[Server.id]["voice"].create_ytdl_player("http://www.youtube.com/watch?v="+ServData[Server.id]["queue"][0]["id"])
                         player.volume = .25
                         player.start()
 
-                        AudioData[Server.id]["player"] = player
+                        ServData[Server.id]["player"] = player
         await asyncio.sleep(.1)
 
 
@@ -672,23 +672,23 @@ async def on_ready():
     time.sleep(.5)
 
     for Server in bot.servers:
-        AudioData[Server.id] = {}
-        AudioData[Server.id]["voice"] = None
-        AudioData[Server.id]["player"] = None
-        AudioData[Server.id]["queue"] = [None]
+        ServData[Server.id] = {}
+        ServData[Server.id]["voice"] = None
+        ServData[Server.id]["player"] = None
+        ServData[Server.id]["queue"] = [None]
 
     schedule_coroutine(MusicLoop())
 
 @bot.event
 async def on_server_join(Server):
-    AudioData[Server.id] = {}
-    AudioData[Server.id]["voice"] = None
-    AudioData[Server.id]["player"] = None
-    AudioData[Server.id]["queue"] = [None]
+    ServData[Server.id] = {}
+    ServData[Server.id]["voice"] = None
+    ServData[Server.id]["player"] = None
+    ServData[Server.id]["queue"] = [None]
 
 @bot.event
 async def on_server_remove(Server):
-    del AudioData[Server.id]
+    del ServData[Server.id]
 
 @bot.event
 async def on_message(Msg):
