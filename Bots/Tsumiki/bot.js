@@ -3,9 +3,17 @@ const discord = require('discord.js');
 
 // Commands
 var cmds = {};
+var tcmds = {};
 
 function createCommand(name, desc, func) {
     cmds[name] = {
+        'desc': desc,
+        'function': func
+    }
+}
+
+function createTerminalCommand(name, desc, func) {
+    tcmds[name] = {
         'desc': desc,
         'function': func
     }
@@ -28,6 +36,16 @@ function parseCommand(msg) {
     }
 
     if(parsed === 0) console.log("Unknown command!");
+}
+
+function parseTerminalCommand(context) {
+    var args = context.split(" ");
+    var parsed = 0;
+    for(var i = 0; i < Object.keys(tcmds).length; i++) {
+        if(tcmds[args[0]] != undefined) {
+            tcmds[args[0]]['function'](context);
+        }
+    }
 }
 
 function mimic(msg) {
@@ -119,3 +137,13 @@ createCommand("funcName", "funcDesc", function(args) {
 
 */
 miniwa.login('TOKEN');
+
+const readline = require('readline');
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
+
+rl.on('line', (input) => {
+    parseTerminalCommand(input);
+});
