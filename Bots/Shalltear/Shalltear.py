@@ -731,6 +731,34 @@ async def PlayingDetails(Bot, Msg, Args):
         
         await Bot.send_message(Msg.author, embed = Embed)
 
+async def Settings(Bot, Msg, Args):
+    if len(Args) == None:
+        Embed = discord.Embed(title = "Settings", color = Msg.author.color)
+        Embed.set_footer(text = "Settings")
+        Embed.add_field(name = "Prefix", value = ServData[Msg.server.id]['prefix'])
+        if ServData[Msg.server.id]['osuchannel'] != None:
+            Embed.add_field(name = "Osu Channel", value = ServData[Msg.server.id]['osuchannel'].mention)
+        else:
+            Embed.add_field(name = "Osu Channel", value = "None")
+        
+        await Bot.send_message(Msg.channel, embed = Embed)
+    else:
+        if len(Args) == 2:
+            if Args[0] == 'prefix':
+                NewPrefix = Args[1]
+                ServData[Msg.server.id]['prefix'] = NewPrefix
+                
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", Prefix changed to `" + NewPrefix + "`")
+        elif len(Args) > 2:
+            if Args[0] == 'prefix':
+                del Args[0]
+                NewPrefix = join(Args, " ")
+                ServData[Msg.server.id]['prefix'] = NewPrefix
+                
+                await Bot.send_message(Msg.channel, Msg.author.mention + ", Prefix changed to `" + NewPrefix + "`")
+        else:
+            
+
 ## Create Command Statements
 
 # General
