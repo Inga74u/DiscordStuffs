@@ -64,7 +64,7 @@ function mimic(msg) {
     msg.channel.send(args.join(" "));
 }
 
-function preix(msg) { // I got lazy, I'll fix it later
+function prefix(msg) { // I got lazy, I'll fix it later
     var args = msg.content.split(" ");
     if(args.length < 2) {
         msg.channel.send("Must have args");
