@@ -22,4 +22,5 @@ Shalltear is being developed by [mushi88 (Kirsi)](https://github.com/mushi88), A
 Tsumiki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u).
 
 #### Required libraries:  
+[NodeJS](https://nodejs.org/en/): A JavaScript runtime built on Chrome's V8 JavaScript engine
 Discord.js: ```npm install --save discord.js```
