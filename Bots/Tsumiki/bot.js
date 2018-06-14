@@ -43,6 +43,12 @@ function parseTerminalCommand(context) {
     var parsed = 0;
     for(var i = 0; i < Object.keys(tcmds).length; i++) {
         if(tcmds[args[0]] != undefined) {
+            if(args.length > 1) {
+                if(args[1] === "-h" || args[1] === "-help" || args[1] === "-?") {
+                    console.log(tcmds[args[0]]['desc']);
+                    return;
+                }
+            }
             tcmds[args[0]]['function'](context);
         }
     }
@@ -98,19 +104,27 @@ function play(msg) {
     //play stuff
 }
 
+// Terminal commands
+function shutdown(context) {
+    //var args = context.split(" ");
+    miniwa.destroy();
+    rl.close();
+}
+
 // Main bot section
 const miniwa = new discord.Client();
 var guilds = {};
 
 miniwa.on('ready', () => {
+    console.log("Online in these guilds: ");
     miniwa.guilds.forEach(function (value, key, map) {
         guilds[key.toString()] = {
             'name': value.toString(),
             'prefix': "tsu."
-            'player': ,
+            'player': undefined,
             'queue': []
         };
-        console.log(guilds[key.toString()]['name'] + ": " + key.toString()); // Just to test that it's working
+        console.log("   " + guilds[key.toString()]['name'] + ": " + key.toString()); // Just to test that it's working
     });
 });
 
@@ -125,13 +139,20 @@ miniwa.on('message', msg => {
     parseCommand(msg);
 });
 
+// Standard commands
 createCommand("mimic", "Mimics what you tell me too. (Usage: mimic [text to mimic])", mimic);
 createCommand("prefix", "Changes the prefix. (Usage: prefix [new prefix])", prefix);
 createCommand("purge", "Deletes an amount of messages from a TextChannel. (Usage: purge [number of messages to purge])", purge);
 
+// Terminal commands
+createTerminalCommand("shutdown", "Shuts down the bot and ends the program.", shutdown);
+
+//Music commands
+//createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link], play)");
+
 /* This is also possible:
 
-createCommand("funcName", "funcDesc", function(args) {
+createCommand("cmdName", "cmdDesc", function(args) {
     // Do stuff
 });
 
