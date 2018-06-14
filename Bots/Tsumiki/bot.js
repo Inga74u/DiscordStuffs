@@ -16,6 +16,12 @@ function parseCommand(msg) {
     var parsed = 0;
     for(var i = 0; i < Object.keys(cmds).length; i++) {
         if(cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)] != undefined) {
+            if(args.length > 1) {
+                if(args[1] === "-h" || args[1] === "-help" || args[1] === "-?") {
+                    msg.channel.send(cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)]['desc']);
+                    return;
+                }
+            }
             cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)]['function'](msg);
             parsed = 1;
         }
@@ -61,7 +67,16 @@ miniwa.on('message', msg => {
     parseCommand(msg);
 });
 
-createCommand("mimic", "mimics", mimic);
+createCommand("mimic", "Mimics what you tell me too. (Usage: mimic [text to mimic])", mimic);
+createCommand("prefix", "Changes the prefix. (Usage: prefix [new prefix])", function(msg) { // I got lazy, I'll fix it later
+    var args = msg.content.split(" ");
+    if(args.length < 2) {
+        msg.channel.send("Must have args");
+        return;
+    }
+    guilds[msg.guild.id]['prefix'] = args[1];
+    msg.channel.send("Prefix changed to: " + guilds[msg.guild.id]['prefix']);
+});
 
 /* This is also possible:
 
