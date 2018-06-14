@@ -3,7 +3,7 @@ A repository for a bunch of Discord bots in my server.
 
 |Bots      |Status                |Progress                                                      |Useable               |Language|Author|
 |:--------:|:--------------------:|:------------------------------------------------------------:|:--------------------:|:------:|:----:|
-|[Kazuki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Kazuki)|Missing Game API's|[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets)|Java|[Inga74u](https://github.com/Inga74u)|
+|[Kazuki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Kazuki)|Missing Game API's|[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets.java)|Java|[Inga74u](https://github.com/Inga74u)|
 |[Shalltear](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Shalltear)|Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|Python|[Katistic](https://github.com/Katistic)|
 |[Tsumiki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Miniwa)|Under Construction|[Project](https://github.com/Inga74u/DiscordStuffs/projects/4)|No|JavaScript|[Inga74u](https://github.com/inga74u)|
   
