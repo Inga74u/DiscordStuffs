@@ -215,7 +215,7 @@ try:
     for x in Data["ServerConfig"]:
         ServData[x] = {}
         ServData[x]['prefix'] = Data['ServerConfig'][x]['Prefix']
-        ServData[x]['osuchannel'] = discord.Object(Data['ServerConfig'][x]['OsuChannel'])
+        ServData[x]['osuchannel'] = Data['ServerConfig'][x]['OsuChannel']
 except:
     while len(Prefix.strip()) == 0:
         Prefix = input("Please enter bot prefix: ")
@@ -330,13 +330,12 @@ async def ListCommands(Bot, Msg, Args):
     await Bot.send_message(Msg.channel, Msg.author.mention + ",\n" + Cmds)
 
 async def Osu(Bot, Msg, Args):
+    toSay = ""
     if OsuCmds:
         tMsg = "What would you like to do?\n`1`. Lookup User\n`2`. Lookup User Best"
         tMsg = await Bot.send_message(Msg.channel, Msg.author.mention + ", " + tMsg)
         Resp = await Bot.wait_for_message(timeout = 10, author = Msg.author, channel = Msg.channel)
-        
         await Bot.delete_message(tMsg)
-        toSay = ""
         if Resp != None:
             if testInt(Resp.content):
                 Ans = int(Resp.content)
@@ -744,23 +743,23 @@ async def Settings(Bot, Msg, Args):
         await Bot.send_message(Msg.channel, embed = Embed)
     else:
         if len(Args) == 2:
-            if Args[0] == 'prefix':
+            if Args[0].lower() == 'prefix':
                 NewPrefix = Args[1]
                 ServData[Msg.server.id]['prefix'] = NewPrefix
                 
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", Prefix changed to `" + NewPrefix + "`")
         elif len(Args) > 2:
-            if Args[0] == 'prefix':
+            if Args[0].lower() == 'prefix':
                 del Args[0]
                 NewPrefix = join(Args, " ")
                 ServData[Msg.server.id]['prefix'] = NewPrefix
                 
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", Prefix changed to `" + NewPrefix + "`")
-        elif Args[0] == 'prefix':
-            await Bot.send_message(Msg.channel, MSg.author.mention + ", You must include what you want to change prefix to!\n`" + ServData[Msg.server.id]['prefix'] + "settings prefix !`")
-        elif Args[0] == 'osu':
+        elif Args[0].lower() == 'prefix':
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", You must include what you want to change prefix to!\n`" + ServData[Msg.server.id]['prefix'] + "settings prefix !`")
+        elif Args[0].lower() == 'osu':
             ServData[Msg.server.id]['osuchannel'] = Msg.channel
-            await Bot.send_message(Msg.channel, MSg.author.mention + ", This channel was set to the osu tracker channel!")
+            await Bot.send_message(Msg.channel, Msg.author.mention + ", This channel was set to the osu tracker channel!")
 
 ## Create Command Statements
 
@@ -811,13 +810,19 @@ async def on_ready():
     time.sleep(.5)
 
     for Server in bot.servers:
-        ServData[Server.id] = {}
+        try:
+            ServData[Server.id]
+        except:
+            ServData[Server.id] = {}
+            ServData[Server.id]["osuchannel"] = None
+            ServData[Server.id]["prefix"] = Prefix
+        
         ServData[Server.id]["voice"] = None
         ServData[Server.id]["player"] = None
         ServData[Server.id]["queue"] = [None]
-        ServData[Server.id]["osuchannel"] = None
-        ServData[Server.id]["prefix"] = Prefix
-        
+
+        if ServData[Server.id]["osuchannel"] != None:
+            ServData[Server.id]["osuchannel"] = discord.utils.get(Server.channels, id = ServData[Server.id]["osuchannel"], type = discord.ChannelType.text)
 
     schedule_coroutine(MusicLoop())
 
@@ -853,7 +858,7 @@ async def on_message(Msg):
             del Data[0]
             if Cmd.lower() in Commands: # Is the message a real command?
                 Msg.content = Msg.content[len(Cmd)+1:]
-                await Commands[Cmd].Do(bot, Msg, Data)
+                await Commands[Cmd.lower()].Do(bot, Msg, Data)
                 
 # bot.run('email', 'password')
 bot.run(Token)
