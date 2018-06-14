@@ -16,7 +16,7 @@ Kazuki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u),
 [JSoup](https://jsoup.org/): A library to simplify html requests  
   
 ## Shalltear
-Shalltear is being developed by [mushi88 (Kirsi)](https://github.com/mushi88), A.K.A, [Katistic (Kat)](https://github.com/Katistic).
+Shalltear is being developed by [mushi88 (Kirsi)](https://github.com/mushi88), aka: [Katistic (Kat)](https://github.com/Katistic).
   
 ## Tsumiki
 Tsumiki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u).
