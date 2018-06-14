@@ -127,6 +127,7 @@ AppPath = os.path.join(Path)
 os.environ["PATH"] += os.pathsep + AppPath
 
 from Bot import Permissions
+from Bot import OsuTracker
 from Bot import Youtube
 
 Commands = {}
@@ -236,11 +237,15 @@ except:
             "OsuKey": None,
             "OwnerId": OwnerId
         },
-        "ServerConfig": {}
+        "ServerConfig": {},
+        "OsuTracking": {}
     }
 
     with open(DataFile, "w") as DF:
         json.dump(Data, DF, indent = 4)
+
+if OsuCmds != False:
+    OsuTrack = OsuTracker.OsuTracker(OsuKey)
 
 # Create Command Stuffs
 
