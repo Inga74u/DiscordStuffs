@@ -732,12 +732,12 @@ async def PlayingDetails(Bot, Msg, Args):
         await Bot.send_message(Msg.author, embed = Embed)
 
 async def Settings(Bot, Msg, Args):
-    if len(Args) == None:
+    if len(Args) == 0:
         Embed = discord.Embed(title = "Settings", color = Msg.author.color)
         Embed.set_footer(text = "Settings")
         Embed.add_field(name = "Prefix", value = ServData[Msg.server.id]['prefix'])
         if ServData[Msg.server.id]['osuchannel'] != None:
-            Embed.add_field(name = "Osu Channel", value = ServData[Msg.server.id]['osuchannel'].mention)
+            Embed.add_field(name = "Osu", value = ServData[Msg.server.id]['osuchannel'].mention)
         else:
             Embed.add_field(name = "Osu Channel", value = "None")
         
@@ -756,8 +756,11 @@ async def Settings(Bot, Msg, Args):
                 ServData[Msg.server.id]['prefix'] = NewPrefix
                 
                 await Bot.send_message(Msg.channel, Msg.author.mention + ", Prefix changed to `" + NewPrefix + "`")
-        else:
-            
+        elif Args[0] == 'prefix':
+            await Bot.send_message(Msg.channel, MSg.author.mention + ", You must include what you want to change prefix to!\n`" + ServData[Msg.server.id]['prefix'] + "settings prefix !`")
+        elif Args[0] == 'osu':
+            ServData[Msg.server.id]['osuchannel'] = Msg.channel
+            await Bot.send_message(Msg.channel, MSg.author.mention + ", This channel was set to the osu tracker channel!")
 
 ## Create Command Statements
 
@@ -768,6 +771,7 @@ createCommand("purge", "Try and purge x amount of messages.", Purge, Permissions
 createCommand("commands", "List all commands.", ListCommands, Permissions.Default)
 createCommand("osu", "Get osu data.", Osu, Permissions.Default)
 createCommand("ping", "Pong!", Ping, Permissions.Default)
+createCommand("settings", "Change and view settings.", Settings, Permissions.Administrator)
 
 # Voice
 
@@ -799,11 +803,8 @@ async def MusicLoop():
                         player.start()
 
                         ServData[Server.id]["player"] = player
-        await asyncio.sleep(.1)
-
 
     schedule_coroutine(MusicLoop())
-
 
 @bot.event
 async def on_ready():
