@@ -103,6 +103,9 @@ venv.bak/
 # mypy
 .mypy_cache/
 
+# Mac shite
+.DS_Store
+
 # Shalltear
 
 Bots/Shalltear/External/ffmpeg/
