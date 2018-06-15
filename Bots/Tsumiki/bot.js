@@ -137,6 +137,7 @@ miniwa.on('ready', () => {
 miniwa.on('message', msg => {
     if(msg.author.bot) return;
     if(msg.guild === null) return;
+    if(guilds[msg.guild.id]['guildSettings']['adminOnly'] /* and user doesn't have admin */) return;
     if(!msg.content.startsWith(guilds[msg.guild.id]['prefix'])) return;
     parseCommand(msg);
 });
