@@ -102,7 +102,10 @@ def _get_playlist_items(client, **kwargs):
             Id = x["snippet"]["resourceId"]["videoId"]
             ChanId = x["snippet"]["channelId"]
             ChanTitle = x["snippet"]["channelTitle"]
-            Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+            try:
+                Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+            except:
+                Tumb = "https://upload.wikimedia.org/wikipedia/commons/5/55/Question_Mark.svg"
 
             items.append({"id": Id,
                           "title": Title,

@@ -8,8 +8,6 @@ import time
 import json
 import os
 
-import discord
-
 def WindowsSetup():
     os.system("pip install -U discord.py[voice]")
     os.system("pip install --upgrade google-api-python-client")
@@ -121,6 +119,8 @@ if platform.system() == "Windows":
     WindowsSetup()
 elif platform.system() == "Darwin":
     MacOSSetup()
+
+import discord
 
 Path = os.path.abspath(".\\External\\ffmpeg\\bin")
 AppPath = os.path.join(Path)
@@ -246,6 +246,8 @@ except:
 
 if OsuCmds != False:
     OsuTrack = OsuTracker.OsuTracker(OsuKey)
+
+os.rename(".\\Bot\\EditSettings.py", ".\\EditSettings.py")
 
 # Create Command Stuffs
 
@@ -386,7 +388,7 @@ async def Osu(Bot, Msg, Args):
                                             Embed = discord.Embed(title = "User", color = Msg.author.color) # Create Embed
                                             Embed.set_footer(text = "Osu")
                                             # Embed.set_image(url = Songs[0]["thumbnail"]) TODO:
-                                            Embed.add_field(name = "Name", value = name)
+                                            Embed.add_field(name = "Name", value = Name)
                                             Embed.add_field(name = "Accuarcy", value = Acc)
                                             Embed.add_field(name = "Rank", value = Rank)
                                             Embed.add_field(name = "Country Rank", value = CountryRank)
@@ -399,6 +401,7 @@ async def Osu(Bot, Msg, Args):
                                             Embed.add_field(name = "50", value = c50)
                                             
                                             await Bot.send_message(Msg.channel, embed = Embed)
+                                            return
                                         else:
                                             toSay += "Could not find user data."
                                     else:
@@ -452,15 +455,17 @@ async def Osu(Bot, Msg, Args):
                                             Embed = discord.Embed(title = "User Best", color = Msg.author.color) # Create Embed
                                             Embed.set_footer(text = "Osu")
                                             # Embed.set_image(url = Songs[0]["thumbnail"]) TODO:
-                                            Embed.add_field(name = "Score", value = score)
+                                            Embed.add_field(name = "Score", value = Score)
                                             Embed.add_field(name = "PP", value = PP)
                                             Embed.add_field(name = "Combo", value = MaxCombo)
                                             Embed.add_field(name = "Rank", value = Rank)
                                             Embed.add_field(name = "300", value = c300)
                                             Embed.add_field(name = "100", value = c100)
                                             Embed.add_field(name = "50", value = c50)
+                                            Embed.add_field(name = "Miss", value = cMiss)
                                             
                                             await Bot.send_message(Msg.channel, embed = Embed)
+                                            return
                                         else:
                                             toSay += "Could not find user data."
                                     else:
@@ -796,6 +801,8 @@ bot = discord.Client()
 
 @bot.event
 async def MusicLoop():
+    await asyncio.sleep(1)
+    
     for Server in bot.servers:
         if len(ServData[Server.id]["queue"]) > 1:
             if ServData[Server.id]["voice"] != None:
