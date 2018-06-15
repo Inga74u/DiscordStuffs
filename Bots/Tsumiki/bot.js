@@ -1,4 +1,5 @@
 const discord = require('discord.js');
+const ytdl = require('ytdl-core');
 const miniwa = new discord.Client();const readline = require('readline');
 const rl = readline.createInterface({input: process.stdin, output: process.stdout});
 
@@ -68,7 +69,7 @@ function mimic(msg) {
     msg.channel.send(args.join(" "));
 }
 
-function prefix(msg) { // I got lazy, I'll fix it later
+function prefix(msg) {
     var args = msg.content.split(" ");
     if(args.length < 2) {
         msg.channel.send("Must have args");
@@ -84,13 +85,16 @@ function purge(msg) {
         msg.channel.send("Purge requires more than 0 arguments");
         return;
     }
-    
+
     parseInt(args[1]);
-    if(args[1] instanceof int) {
+    if(args[1] instanceof Number) {
         msg.channel.send("First argument must be a number");
         return;
     }
-    
+    args[1]++;
+
+    if(args[1] > 100) args[1] = 100;
+
     msg.channel.bulkDelete(args[1]);
 }
 
@@ -100,12 +104,61 @@ function play(msg) {
         msg.channel.send("Play requires more than 0 arguments");
         return;
     }
-    
+
+    if(!msg.member.voiceChannel) {
+        msg.channel.send("You must be in a voice channel");
+        return;
+    }
+
     if(!args[1].indexOf("youtube.com")) {
         msg.channel.send("1st argument must be a YouTube link");
         return;
     }
-    //play stuff
+
+    guilds[msg.guild.id]['queue'].push(args[1]);
+
+    if(!msg.guild.voiceConnection) {
+        msg.member.voiceChannel.join().then(function(connection) {
+            _play(connection, msg);
+        });
+    }
+}
+
+function _play(connection, msg) {
+    guilds[msg.guild.id]['player'] = connection.playStream(ytdl(guilds[msg.guild.id]['queue'][0], {filter: "audioonly"}));
+    guilds[msg.guild.id]['queue'].shift();
+
+    guilds[msg.guild.id]['player'].on('end', function() {
+        if(guilds[msg.guild.id]['queue'][0]) {
+            _play(connection, msg);
+        }
+    });
+}
+
+function queue(msg) {
+    var songNames = [];
+    var songTimes = [];
+    var finalString = [];
+    guilds[msg.guild.id]['queue'].forEach(function(item, index) {
+        ytdl.getInfo(item, function(err, info) {
+            songNames.push(info.title);
+            songTimes.push(info.length_seconds);
+        });
+    });
+
+    finalString.push("Songs currently in the queue:");
+    for(var i = 0; i < guilds[msg.guild.id]['queue'].length; i++) {
+        var sec = parseInt(songTimes[i]);
+        var mins = Math.floor(sec / 60);
+        var remainder = sec % 60;
+        finalString.push("`" + i + "` " + songNames[i] + " (" + mins + ":" + remainder + "s)");
+    }
+
+    msg.channel.send(finalString.join(" \n"));
+}
+
+function skip(msg) {
+    if(guilds[msg.guild.id]['player']) guilds[msg.guild.id]['player'].end();
 }
 
 // Terminal commands
@@ -152,25 +205,24 @@ createCommand("purge", "Deletes an amount of messages from a TextChannel. (Usage
 createTerminalCommand("shutdown", "Shuts down the bot and ends the program.", shutdown);
 
 //Music commands
-//createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link], play)");
+createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link])", play);
 //createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
 //createCommand("pause", "Pauses the currently playing song. (Usage: pause)", pause);
 //createCommand("resume", "Resumes the currently paused song, if there is one. (Usage: resume)", resume);
 //createCommand("stop", "Stops the currently playing song and clears the queue. (Usage: stop)", stop);
-//createCommand("skip", "Skips the currently playing song and starts the next if there is one. (Usage: skip)", skip);
+createCommand("skip", "Skips the currently playing song and starts the next if there is one. (Usage: skip)", skip);
 //createCommand("join", "Joins the VoiceChannel you specify. (Usage: join [channel id])", join);
 //createCommand("summon", "Joins the VoiceChannel you are currently in. (Usage: join), summon);
 //createCommand("leave", "Leaves the VoiceChannel. This stops the currently playing song and clears the queue (Usage: leave)", leave);
 
 /* This is also possible:
-
 createCommand("cmdName", "cmdDesc", function(args) {
     // Do stuff
 });
-
 */
-miniwa.login('TOKEN');
 
 rl.on('line', (input) => {
     parseTerminalCommand(input);
 });
+
+miniwa.login('TOKEN');
