@@ -1,9 +1,13 @@
 const discord = require('discord.js');
+const miniwa = new discord.Client();const readline = require('readline');
+const rl = readline.createInterface({input: process.stdin, output: process.stdout});
+
 // Ideas proudly stolen from my good friend Katistic!
 
-// Commands
+var guilds = {};
 var cmds = {};
 var tcmds = {};
+// Commands
 
 function createCommand(name, desc, func) {
     cmds[name] = {
@@ -112,24 +116,22 @@ function shutdown(context) {
 }
 
 // Main bot section
-const miniwa = new discord.Client();
-var guilds = {};
-
 miniwa.on('ready', () => {
     console.log("Online in these guilds: ");
     miniwa.guilds.forEach(function (value, key, map) {
         guilds[key.toString()] = {
             'name': value.toString(),
-            'prefix': "tsu."
+            'prefix': "tsu.",
             'player': undefined,
-            'queue': []
+            'queue': [],
+            'guildSettings': {
+                'idle': false,
+                'adminOnly': false,
+                'adminOnlyMusic': false
+            }
         };
         console.log("   " + guilds[key.toString()]['name'] + ": " + key.toString()); // Just to test that it's working
     });
-});
-
-miniwa.on('connect', connection => {
-
 });
 
 miniwa.on('message', msg => {
@@ -143,12 +145,21 @@ miniwa.on('message', msg => {
 createCommand("mimic", "Mimics what you tell me too. (Usage: mimic [text to mimic])", mimic);
 createCommand("prefix", "Changes the prefix. (Usage: prefix [new prefix])", prefix);
 createCommand("purge", "Deletes an amount of messages from a TextChannel. (Usage: purge [number of messages to purge])", purge);
+//createCommand("idle", "Sets the state for idle voice lines for the guild (Usage: idle, idle [on or true / off or false])", idle);
 
 // Terminal commands
 createTerminalCommand("shutdown", "Shuts down the bot and ends the program.", shutdown);
 
 //Music commands
 //createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link], play)");
+//createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
+//createCommand("pause", "Pauses the currently playing song. (Usage: pause)", pause);
+//createCommand("resume", "Resumes the currently paused song, if there is one. (Usage: resume)", resume);
+//createCommand("stop", "Stops the currently playing song and clears the queue. (Usage: stop)", stop);
+//createCommand("skip", "Skips the currently playing song and starts the next if there is one. (Usage: skip)", skip);
+//createCommand("join", "Joins the VoiceChannel you specify. (Usage: join [channel id])", join);
+//createCommand("summon", "Joins the VoiceChannel you are currently in. (Usage: join), summon);
+//createCommand("leave", "Leaves the VoiceChannel. This stops the currently playing song and clears the queue (Usage: leave)", leave);
 
 /* This is also possible:
 
@@ -158,12 +169,6 @@ createCommand("cmdName", "cmdDesc", function(args) {
 
 */
 miniwa.login('TOKEN');
-
-const readline = require('readline');
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout
-});
 
 rl.on('line', (input) => {
     parseTerminalCommand(input);
