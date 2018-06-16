@@ -37,6 +37,7 @@ function parseCommand(msg) {
             }
             cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)]['function'](msg);
             parsed = 1;
+            break;
         }
     }
 
@@ -126,23 +127,24 @@ function play(msg) {
 
 function _play(connection, msg) {
     guilds[msg.guild.id]['player'] = connection.playStream(ytdl(guilds[msg.guild.id]['queue'][0], {filter: "audioonly"}));
-    guilds[msg.guild.id]['queue'].shift();
-
     guilds[msg.guild.id]['player'].on('end', function() {
+        console.log("repeat");
+        guilds[msg.guild.id]['queue'].shift();
         if(guilds[msg.guild.id]['queue'][0]) {
             _play(connection, msg);
         }
     });
 }
-
+/*
 function queue(msg) {
     var songNames = [];
     var songTimes = [];
     var finalString = [];
-    guilds[msg.guild.id]['queue'].forEach(function(item, index) {
+    guilds[msg.guild.id]['queue'].forEach(function(item) {
+        console.log(item);
         ytdl.getInfo(item, function(err, info) {
-            songNames.push(info.title);
-            songTimes.push(info.length_seconds);
+            songNames.push(info['title']);
+            console.log(info['length_seconds']);
         });
     });
 
@@ -151,10 +153,25 @@ function queue(msg) {
         var sec = parseInt(songTimes[i]);
         var mins = Math.floor(sec / 60);
         var remainder = sec % 60;
-        finalString.push("`" + i + "` " + songNames[i] + " (" + mins + ":" + remainder + "s)");
+        finalString.push("`" + (i + 1) + "` " + songNames[i] + " (" + mins + ":" + remainder + "s)");
     }
-
     msg.channel.send(finalString.join(" \n"));
+}
+*/
+
+async function queue(msg) {
+    var queue = [];
+    queue.push("Songs currently in the queue:");
+    var finalMsg = await msg.channel.send("Fetching queue info...");
+    for(var i = 0; i < guilds[msg.guild.id]['queue'].length; i++){
+        const info = await ytdl.getInfo(guilds[msg.guild.id]['queue'][i]);
+        var sec = parseInt(info.length_seconds);
+        var mins = Math.floor(sec / 60);
+        var remainder = sec % 60;
+        queue.push("`" + (i + 1) + "` " + info.title + " (" + mins + ":" + remainder + ")");
+    }
+    finalMsg.delete();
+    msg.channel.send(queue.join("\n "));
 }
 
 function skip(msg) {
@@ -206,7 +223,7 @@ createTerminalCommand("shutdown", "Shuts down the bot and ends the program.", sh
 
 //Music commands
 createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link])", play);
-//createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
+createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
 //createCommand("pause", "Pauses the currently playing song. (Usage: pause)", pause);
 //createCommand("resume", "Resumes the currently paused song, if there is one. (Usage: resume)", resume);
 //createCommand("stop", "Stops the currently playing song and clears the queue. (Usage: stop)", stop);
