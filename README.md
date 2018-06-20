@@ -4,9 +4,8 @@ A repository for a bunch of Discord bots in my server.
 |Bots      |Status                |Progress                                                     |Useable               |Language|Author|
 |:--------:|:--------------------:|:-----------------------------------------------------------:|:--------------------:|:------:|:----:|
 |[Kazuki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Kazuki)|Missing Game API's|[Project](https://github.com/Inga74u/DiscordStuffs/projects/2)|Yes (Fill out Secrets.java)|[Java](https://java.com/en/)|[Inga74u](https://github.com/Inga74u)|
-|[Shalltear](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Shalltear)|Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|[Python (3.6.5)[(https://www.python.org/)|[Katistic](https://github.com/Katistic)|
-|[Tsumiki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Miniwa)|Under Construction|[Project](https://github.com/Inga74u/DiscordStuffs/projects/4)|For the most part|[JavaScript](https://nodejs.org/en/
-)|[Inga74u](https://github.com/inga74u)|
+|[Shalltear](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Shalltear)|Rework|[Project](https://github.com/Inga74u/DiscordStuffs/projects/1)|Sometimes|[Python (3.6.5)](https://www.python.org/)|[Katistic](https://github.com/Katistic)|
+|[Tsumiki](https://github.com/Inga74u/DiscordStuffs/tree/master/Bots/Miniwa)|Under Construction|[Project](https://github.com/Inga74u/DiscordStuffs/projects/4)|For the most part|[JavaScript](https://nodejs.org/en/)|[Inga74u](https://github.com/inga74u)|
   
 ## Kazuki
 Kazuki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u), currently it is a part of his own Java program 'Thanatos' and has to be detached from said program to be uploaded everytime. 
