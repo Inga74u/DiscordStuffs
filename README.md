@@ -24,3 +24,5 @@ Tsumiki is being developed by [Inga74u (Inga因果)](https://github.com/inga74u)
 #### Required libraries:  
 [NodeJS](https://nodejs.org/en/): A JavaScript runtime built on Chrome's V8 JavaScript engine  
 Discord.js: ```npm install --save discord.js```  
+ytdl-core: ```npm install --save ytdl-core```  
+opusscript: ```npm install --save opusscript```  
