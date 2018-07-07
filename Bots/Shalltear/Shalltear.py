@@ -247,7 +247,10 @@ except:
 if OsuCmds != False:
     OsuTrack = OsuTracker.OsuTracker(OsuKey)
 
-os.rename(".\\Bot\\EditSettings.py", ".\\EditSettings.py")
+try:
+    os.rename(".\\Bot\\EditSettings.py", ".\\EditSettings.py")
+except:
+    pass
 
 # Create Command Stuffs
 
@@ -548,8 +551,7 @@ async def Play(Bot, Msg, Args):
             ServData[Msg.server.id]['queue'].insert(1, Songs[0])
             
             if player != None:
-                player.stop()
-                ServData[Msg.server.id]['player'] = None
+                await Skip(Bot, Msg, Args)
 
             await Bot.send_message(Msg.channel, Msg.author.mention + ",\n**Now Playing**\n```" + Songs[0]["title"] + "```\n" + "Uploaded by `" + Songs[0]["chantitle"] + "`\n" +Songs[0]["thumbnail"])
         else:
