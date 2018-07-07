@@ -8,8 +8,8 @@ const rl = readline.createInterface({input: process.stdin, output: process.stdou
 var guilds = {};
 var cmds = {};
 var tcmds = {};
-// Commands
 
+// Commands
 function createCommand(name, desc, func) {
     cmds[name] = {
         'desc': desc,
@@ -26,7 +26,6 @@ function createTerminalCommand(name, desc, func) {
 
 function parseCommand(msg) {
     var args = msg.content.split(" ");
-    var parsed = 0;
     for(var i = 0; i < Object.keys(cmds).length; i++) {
         if(cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)] != undefined) {
             if(args.length > 1) {
@@ -37,10 +36,12 @@ function parseCommand(msg) {
             }
             cmds[args[0].slice(guilds[msg.guild.id]['prefix'].length)]['function'](msg);
             parsed = 1;
+            break;
+        } else {
+            console.log("Unknown command!")
+            break;
         }
     }
-
-    if(parsed === 0) console.log("Unknown command!");
 }
 
 function parseTerminalCommand(context) {
@@ -55,6 +56,10 @@ function parseTerminalCommand(context) {
                 }
             }
             tcmds[args[0]]['function'](context);
+            break;
+        } else {
+            console.log("Unknown command!");
+            break;
         }
     }
 }
@@ -92,12 +97,11 @@ function purge(msg) {
         return;
     }
     args[1]++;
-
     if(args[1] > 100) args[1] = 100;
-
     msg.channel.bulkDelete(args[1]);
 }
 
+// Music commands
 function play(msg) {
     var args = msg.content.split(" ");
     if(args.length < 2) {
@@ -126,39 +130,81 @@ function play(msg) {
 
 function _play(connection, msg) {
     guilds[msg.guild.id]['player'] = connection.playStream(ytdl(guilds[msg.guild.id]['queue'][0], {filter: "audioonly"}));
-    guilds[msg.guild.id]['queue'].shift();
-
     guilds[msg.guild.id]['player'].on('end', function() {
+        console.log("repeat");
+        guilds[msg.guild.id]['queue'].shift();
         if(guilds[msg.guild.id]['queue'][0]) {
             _play(connection, msg);
         }
     });
 }
 
-function queue(msg) {
-    var songNames = [];
-    var songTimes = [];
-    var finalString = [];
-    guilds[msg.guild.id]['queue'].forEach(function(item, index) {
-        ytdl.getInfo(item, function(err, info) {
-            songNames.push(info.title);
-            songTimes.push(info.length_seconds);
-        });
-    });
-
-    finalString.push("Songs currently in the queue:");
-    for(var i = 0; i < guilds[msg.guild.id]['queue'].length; i++) {
-        var sec = parseInt(songTimes[i]);
+async function queue(msg) {
+    var queue = [];
+    queue.push("Songs currently in the queue:");
+    var finalMsg = await msg.channel.send("Fetching queue info...");
+    for(var i = 0; i < guilds[msg.guild.id]['queue'].length; i++){
+        const info = await ytdl.getInfo(guilds[msg.guild.id]['queue'][i]);
+        var sec = parseInt(info.length_seconds);
         var mins = Math.floor(sec / 60);
         var remainder = sec % 60;
-        finalString.push("`" + i + "` " + songNames[i] + " (" + mins + ":" + remainder + "s)");
+        queue.push("`" + (i + 1) + "` " + info.title + " (" + mins + ":" + remainder + ")");
     }
+    finalMsg.delete();
+    msg.channel.send(queue.join("\n "));
+}
 
-    msg.channel.send(finalString.join(" \n"));
+function pause(msg) {
+    if(!guilds[msg.guild.id]['player']) return;
+    if(!guilds[msg.guild.id]['queue'][0]) {
+        msg.channel.send("I can't pause nothing...");
+        return;
+    }
+    guilds[msg.guild.id]['player'].pause();
+    msg.channel.send("Player paused.");
+}
+
+function resume(msg) {
+    if(!guilds[msg.guild.id]['player']) return;
+    if(!guilds[msg.guild.id]['player'].paused()) {
+        msg.channel.send("I'm not even paused!");
+        return;
+    }
+}
+
+function stop(msg) {
+    if(!guilds[msg.guild.id]['player']) return;
+    if(!guilds[msg.guild.id]['queue'][0]) {
+        msg.channel.sent("What am I supposed to be stopping?");
+        return;
+    }
+    guilds[msg.guild.id]['queue'] = [];
+    guilds[msg.guild.id]['player'].end();
 }
 
 function skip(msg) {
     if(guilds[msg.guild.id]['player']) guilds[msg.guild.id]['player'].end();
+}
+
+function join(msg) {
+
+}
+
+function summon(msg) {
+    if(!msg.member.voiceChannel) {
+        msg.channel.send("You must be in a voice channel");
+        return;
+    }
+
+    msg.member.voiceChannel.join();
+}
+
+function leave(msg) {
+    if(!msg.guild.voiceConnection) {
+        msg.channel.send("I'm not connected to any VoiceChannels...");
+        return;
+    }
+    msg.guild.voiceConnection.disconnect();
 }
 
 // Terminal commands
@@ -206,14 +252,14 @@ createTerminalCommand("shutdown", "Shuts down the bot and ends the program.", sh
 
 //Music commands
 createCommand("play", "Uses a link to play a song. (Usage: play [YouTube song link])", play);
-//createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
-//createCommand("pause", "Pauses the currently playing song. (Usage: pause)", pause);
-//createCommand("resume", "Resumes the currently paused song, if there is one. (Usage: resume)", resume);
-//createCommand("stop", "Stops the currently playing song and clears the queue. (Usage: stop)", stop);
+createCommand("queue", "Lists the first 10 songs in the queue. (Usage: queue)", queue);
+createCommand("pause", "Pauses the currently playing song. (Usage: pause)", pause);
+createCommand("resume", "Resumes the currently paused song, if there is one. (Usage: resume)", resume);
+createCommand("stop", "Stops the currently playing song and clears the queue. (Usage: stop)", stop);
 createCommand("skip", "Skips the currently playing song and starts the next if there is one. (Usage: skip)", skip);
-//createCommand("join", "Joins the VoiceChannel you specify. (Usage: join [channel id])", join);
-//createCommand("summon", "Joins the VoiceChannel you are currently in. (Usage: join), summon);
-//createCommand("leave", "Leaves the VoiceChannel. This stops the currently playing song and clears the queue (Usage: leave)", leave);
+createCommand("join", "Joins the VoiceChannel you specify. (Usage: join [channel id])", join);
+createCommand("summon", "Joins the VoiceChannel you are currently in. (Usage: join)", summon);
+createCommand("leave", "Leaves the VoiceChannel. This stops the currently playing song and clears the queue (Usage: leave)", leave);
 
 /* This is also possible:
 createCommand("cmdName", "cmdDesc", function(args) {

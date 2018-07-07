@@ -1,6 +1,5 @@
 import urllib.request
 import threading
-import requests
 import platform
 import asyncio
 import zipfile
@@ -12,9 +11,11 @@ def WindowsSetup():
     os.system("pip install -U discord.py[voice]")
     os.system("pip install --upgrade google-api-python-client")
     os.system("pip install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
-
+    os.system("pip install -U requests")
     os.system("pip install -U youtube_dl")
 
+    import requests
+    
     try:
         from tqdm import tqdm
     except:
@@ -81,8 +82,10 @@ def MacOSSetup():
     os.system("pip3 install -U discord.py[voice]")
     os.system("pip3 install --upgrade google-api-python-client")
     os.system("pip3 install --upgrade google-auth google-auth-oauthlib google-auth-httplib2")
-
+    os.system("pip3 install -U requests")
     os.system("pip3 install -U youtube_dl")
+
+    import requests
 
     try:
         from tqdm import tqdm
