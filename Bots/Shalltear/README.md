@@ -23,5 +23,15 @@ tqdm: ```pip3 install -U tqdm```
 ## External Dependancies
 ### The bot installs these, depending on your os. I will add all for all platforms I can in the near future.
 
-#### Git -- Auto Installed for Windows
-Git is auto-downloaded 
+#### Git
+Git is auto-downloaded on windows, not yet on MacOS
+
+#### FFMPEG
+FFMPEG is auto-downloaded on both windows and MacOS
+
+# I don't want to host this bot, what can I do?
+
+I host a version of it on my internet, it is not always on and my internet is crap, but here you go.
+
+
+[Invite](https://discordapp.com/api/oauth2/authorize?client_id=454936567690297344&permissions=36793344&scope=bot)
