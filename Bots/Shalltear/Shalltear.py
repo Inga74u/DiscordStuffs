@@ -3,6 +3,7 @@ import threading
 import platform
 import asyncio
 import zipfile
+import random
 import time
 import json
 import os
@@ -775,6 +776,13 @@ async def Settings(Bot, Msg, Args):
         elif Args[0].lower() == 'osu':
             ServData[Msg.server.id]['osuchannel'] = Msg.channel
             await Bot.send_message(Msg.channel, Msg.author.mention + ", This channel was set to the osu tracker channel!")
+
+async def Shuffle(Bot, Msg, Args):
+    Q = ServData[Msg.server.id]['queue']
+    random.shuffle(Q)
+    ServData[Msg.server.id]['queue'] = Q
+
+    await Bot.send_message(Msg.channel, Msg.author.mention + ", Queue shuffled.")
 
 ## Create Command Statements
 
