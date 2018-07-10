@@ -105,7 +105,7 @@ def _get_playlist_items(client, **kwargs):
             try:
                 Thumb = x["snippet"]["thumbnails"]["default"]["url"]
             except:
-                Tumb = "https://upload.wikimedia.org/wikipedia/commons/5/55/Question_Mark.svg"
+                Thumb = "https://cdn.discordapp.com/attachments/445094448548937730/465950613470183444/load.gif"
 
             items.append({"id": Id,
                           "title": Title,
@@ -130,7 +130,10 @@ def _get_playlist_items(client, **kwargs):
                 Id = x["snippet"]["resourceId"]["videoId"]
                 ChanId = x["snippet"]["channelId"]
                 ChanTitle = x["snippet"]["channelTitle"]
-                Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+                try:
+                    Thumb = x["snippet"]["thumbnails"]["default"]["url"]
+                except:
+                    Thumb = "https://cdn.discordapp.com/attachments/445094448548937730/465950613470183444/load.gif"
 
                 items.append({"id": Id,
                               "title": Title,
